@@ -41,7 +41,7 @@ def collect_data(subreddit, keyword):
     return data
 
 def main():
-    subreddits = ['ukpolitics', 'PoliticsUK','unitedkingdom','Scotland','Wales', 'northernireland', 'england','GreenParty','LeftWingUK','LabourUK','Labour','SNP','ScottishGreenParty','UKGreens','plaidcymru','RightWingUK','tories','reformuk','brexitpartyuk','brexit','TaxUK']  # List of subreddits
+    subreddits = ['ukpolitics']#, 'PoliticsUK','unitedkingdom','Scotland','Wales', 'northernireland', 'england','GreenParty','LeftWingUK','LabourUK','Labour','SNP','ScottishGreenParty','UKGreens','plaidcymru','RightWingUK','tories','reformuk','brexitpartyuk','brexit','TaxUK']  # List of subreddits
     keywords = [
     'Israel', 'Palestine', 'Israel-Palestine', 'Pro-Palestine', 'Pro-Israel',
     'Gaza', 'West Bank', 'Hamas', 'Ceasefire', 'Protest', 'Zionist/Zionism',

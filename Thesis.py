@@ -54,25 +54,26 @@ def main():
     keywords = [
         'Israel', 'Palestine', 'Israel-Palestine', 'Pro-Palestine', 'Pro-Israel',
         'Gaza', 'West Bank', 'Hamas', 'Ceasefire', 'Protest', 'Zionist/Zionism',
-        'Antisemitist/Antisemitism', 'Boycott', 'Occupation', 'Annexation',
-        'Israel-Palestine War/War', 'Israel-Palestine Conflict/Conflict',
+        'Antisemitist','Antisemitism', 'Boycott', 'Occupation', 'Annexation',
+        'Israel-Palestine War','War', 'Israel-Palestine Conflict','Conflict',
         'Gaza Genocide/Genocide', 'Gaza Strip', 'Palestine Refugees', 'IDF',
-        'Israel Defense Forces', 'PLO', 'Palestine Liberation Organization'
+        'Israel Defense Forces', 'PLO', 'Palestine Liberation Organization',
+        'Genocide'
     ]
 
-    if not os.path.exists('reddit_data.csv'):
-        pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv('reddit_data.csv', index=False)
+    if not os.path.exists('Israel-Palestine.csv'):
+        pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv('Israel-Palestine.csv', index=False)
 
     for subreddit in subreddits:
         for keyword in keywords:
             subreddit_data = collect_data(subreddit, keyword)
             
-            df_existing = pd.read_csv('reddit_data.csv')
+            df_existing = pd.read_csv('Israel-Palestine.csv')
             df_new = pd.DataFrame(subreddit_data)
             df = pd.concat([df_existing, df_new], ignore_index=True)
             
-            df.to_csv('reddit_data.csv', index=False)
-            print(f"Info for keyword '{keyword}' from subreddit '{subreddit}' added to reddit_data.csv")
+            df.to_csv('Israel-Palestine.csv', index=False)
+            print(f"Info for keyword '{keyword}' from subreddit '{subreddit}' added to Israel-Palestine.csv")
 
 if __name__ == '__main__':
     main()

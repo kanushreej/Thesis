@@ -9,48 +9,56 @@ reddit = praw.Reddit(
     user_agent='adam'
 )
 
-def collect_data(subreddit, keyword):
+def collect_data(subreddit, keyword, item_limit=30):
     """Collect posts and comments from a specific subreddit based on a keyword."""
     data = []
+    count = 0
 
     for submission in reddit.subreddit(subreddit).search(keyword, limit=None):
-        data.append({
-            'subreddit': subreddit,
-            'type': 'post',
-            'keyword': keyword,
-            'id': submission.id,
-            'author': str(submission.author),
-            'title': submission.title,
-            'body': submission.selftext,
-            'created_utc': datetime.fromtimestamp(submission.created_utc, tz=timezone.utc).isoformat()
-        })
-        
-        submission.comments.replace_more(limit=0)
-        for comment in submission.comments.list():
+        if count < item_limit:
             data.append({
                 'subreddit': subreddit,
-                'type': 'comment',
+                'type': 'post',
                 'keyword': keyword,
-                'id': comment.id,
-                'author': str(comment.author),
-                'title': '',
-                'body': comment.body,
-                'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
+                'id': submission.id,
+                'author': str(submission.author),
+                'title': submission.title,
+                'body': submission.selftext,
+                'created_utc': datetime.fromtimestamp(submission.created_utc, tz=timezone.utc).isoformat()
             })
+            count += 1
+
+        submission.comments.replace_more(limit=0)
+        for comment in submission.comments.list():
+            if count < item_limit:
+                data.append({
+                    'subreddit': subreddit,
+                    'type': 'comment',
+                    'keyword': keyword,
+                    'id': comment.id,
+                    'author': str(comment.author),
+                    'title': '',
+                    'body': comment.body,
+                    'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
+                })
+                count += 1
+            if count >= item_limit:
+                break
+        if count >= item_limit:
+            break
 
     return data
 
 def main():
-    subreddits = ['ukpolitics']#, 'PoliticsUK','unitedkingdom','Scotland','Wales', 'northernireland', 'england','GreenParty','LeftWingUK','LabourUK','Labour','SNP','ScottishGreenParty','UKGreens','plaidcymru','RightWingUK','tories','reformuk','brexitpartyuk','brexit','TaxUK']  # List of subreddits
+    subreddits = ['ukpolitics', 'PoliticsUK', 'unitedkingdom', 'Scotland', 'Wales', 'northernireland', 'england', 'GreenParty', 'LeftWingUK', 'LabourUK', 'Labour', 'SNP', 'ScottishGreenParty', 'UKGreens', 'plaidcymru', 'RightWingUK', 'tories', 'reformuk', 'brexitpartyuk', 'brexit', 'TaxUK']
     keywords = [
-    'Israel', 'Palestine', 'Israel-Palestine', 'Pro-Palestine', 'Pro-Israel',
-    'Gaza', 'West Bank', 'Hamas', 'Ceasefire', 'Protest', 'Zionist/Zionism',
-    'Antisemitist/Antisemitism', 'Boycott', 'Occupation', 'Annexation',
-    'Israel-Palestine War/War', 'Israel-Palestine Conflict/Conflict',
-    'Gaza Genocide/Genocide', 'Gaza Strip', 'Palestine Refugees', 'IDF',
-    'Israel Defense Forces', 'PLO', 'Palestine Liberation Organization'
+        'Israel', 'Palestine', 'Israel-Palestine', 'Pro-Palestine', 'Pro-Israel',
+        'Gaza', 'West Bank', 'Hamas', 'Ceasefire', 'Protest', 'Zionist/Zionism',
+        'Antisemitist/Antisemitism', 'Boycott', 'Occupation', 'Annexation',
+        'Israel-Palestine War/War', 'Israel-Palestine Conflict/Conflict',
+        'Gaza Genocide/Genocide', 'Gaza Strip', 'Palestine Refugees', 'IDF',
+        'Israel Defense Forces', 'PLO', 'Palestine Liberation Organization'
     ]
-  # List of keywords
 
     if not os.path.exists('reddit_data.csv'):
         pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv('reddit_data.csv', index=False)

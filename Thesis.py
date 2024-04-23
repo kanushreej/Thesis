@@ -41,8 +41,16 @@ def collect_data(subreddit, keyword):
     return data
 
 def main():
-    subreddits = ['immigration', 'immigrationUS']  # List of subreddits
-    keywords = ['permanent residency', 'citizenship']  # List of keywords
+    subreddits = ['ukpolitics', 'PoliticsUK','unitedkingdom','Scotland','Wales', 'northernireland', 'england','GreenParty','LeftWingUK','LabourUK','Labour','SNP','ScottishGreenParty','UKGreens','plaidcymru','RightWingUK','tories','reformuk','brexitpartyuk','brexit','TaxUK']  # List of subreddits
+    keywords = [
+    'Israel', 'Palestine', 'Israel-Palestine', 'Pro-Palestine', 'Pro-Israel',
+    'Gaza', 'West Bank', 'Hamas', 'Ceasefire', 'Protest', 'Zionist/Zionism',
+    'Antisemitist/Antisemitism', 'Boycott', 'Occupation', 'Annexation',
+    'Israel-Palestine War/War', 'Israel-Palestine Conflict/Conflict',
+    'Gaza Genocide/Genocide', 'Gaza Strip', 'Palestine Refugees', 'IDF',
+    'Israel Defense Forces', 'PLO', 'Palestine Liberation Organization'
+    ]
+  # List of keywords
 
     if not os.path.exists('reddit_data.csv'):
         pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv('reddit_data.csv', index=False)

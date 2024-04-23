@@ -4,9 +4,9 @@ import pandas as pd
 from datetime import datetime, timezone
 
 reddit = praw.Reddit(
-    client_id='wEP3RUiICi5YvjDKhEKlkg',
-    client_secret='FP8O4SUc6ocAGNgCx5HB1-nczz6uQw',
-    user_agent='script:keyword_extractor:v1.0 (by u/Queasy-Parsnip-8103)'
+    client_id='vInV29b0TXkkpagkYMoPLQ',
+    client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
+    user_agent='adam'
 )
 
 def collect_data(subreddit, keyword):

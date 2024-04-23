@@ -9,13 +9,13 @@ reddit = praw.Reddit(
     user_agent='adam'
 )
 
-def collect_data(subreddit, keyword, item_limit=30):
+def collect_data(subreddit, keyword, df_existing, item_limit=30):
     """Collect posts and comments from a specific subreddit based on a keyword."""
     data = []
     count = 0
 
     for submission in reddit.subreddit(subreddit).search(keyword, limit=None):
-        if count < item_limit:
+        if count < item_limit and submission.id not in df_existing['id'].values:
             data.append({
                 'subreddit': subreddit,
                 'type': 'post',
@@ -30,7 +30,7 @@ def collect_data(subreddit, keyword, item_limit=30):
 
         submission.comments.replace_more(limit=0)
         for comment in submission.comments.list():
-            if count < item_limit:
+            if count < item_limit and comment.id not in df_existing['id'].values:
                 data.append({
                     'subreddit': subreddit,
                     'type': 'comment',
@@ -64,16 +64,18 @@ def main():
     if not os.path.exists('Israel-Palestine.csv'):
         pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv('Israel-Palestine.csv', index=False)
 
+    df_existing = pd.read_csv('Israel-Palestine.csv')
+
     for subreddit in subreddits:
         for keyword in keywords:
-            subreddit_data = collect_data(subreddit, keyword)
+            subreddit_data = collect_data(subreddit, keyword, df_existing)
             
-            df_existing = pd.read_csv('Israel-Palestine.csv')
             df_new = pd.DataFrame(subreddit_data)
-            df = pd.concat([df_existing, df_new], ignore_index=True)
+            if not df_new.empty:
+                df_existing = pd.concat([df_existing, df_new], ignore_index=True)
             
-            df.to_csv('Israel-Palestine.csv', index=False)
-            print(f"Info for keyword '{keyword}' from subreddit '{subreddit}' added to Israel-Palestine.csv")
+    df_existing.to_csv('Israel-Palestine.csv', index=False)
+    print("Data collection complete and saved to Israel-Palestine.csv.")
 
 if __name__ == '__main__':
     main()

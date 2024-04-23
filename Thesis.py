@@ -80,7 +80,7 @@ def main():
                 print(f"Info for keyword '{keyword}' from subreddit '{subreddit}' added to {csv_path}")
             except Exception as e:
                 print(f"Error collecting data for keyword '{keyword}' in subreddit '{subreddit}': {e}")
-                time.sleep(60)  # Simple delay, adjust as needed based on the specific rate limit encountered
+                time.sleep(60)  # Simple delay, adjust as needed 
 
 if __name__ == '__main__':
     main()

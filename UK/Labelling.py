@@ -15,7 +15,13 @@ if not os.path.exists(copy_file):
 df = pd.read_csv(copy_file)
 pd.set_option('display.max_colwidth', None)
 
-new_columns = ['brexit', 'antibrexit', 'school shootings']
+new_columns = [
+    'pro_israel', 'pro_palestine',  
+    'public_healthcare', 'private_healthcare',  
+    'high_tax', 'low_tax',  
+    'neutral', 'irrelevant'  
+]
+
 for column in new_columns:
     if column not in df.columns:
         df[column] = float('nan')

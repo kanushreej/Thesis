@@ -4,8 +4,8 @@ import pandas as pd
 import shutil
 
 
-original_file = 'Israel-Palestine/Israel-Palestine.csv'  # PLEASE CHANGE FILENAME IF NEEDED
-copy_file = 'Israel-Palestine/Labelled.csv' # PLEASE CHANGE FILENAME IF NEEDEd
+original_file = 'UK/Israel-Palestine/Israel-Palestine.csv'  # PLEASE CHANGE FILENAME IF NEEDED
+copy_file = 'UK/Israel-Palestine/Labelled.csv' # PLEASE CHANGE FILENAME IF NEEDEd
 progress_file = 'progress.json'
 
 if not os.path.exists(copy_file):

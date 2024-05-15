@@ -1,63 +1,61 @@
 import pandas as pd
-import spacy
 import numpy as np
-import re
+import torch
+from transformers import BertTokenizer, BertModel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 import umap
 import hdbscan
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
-# Load data
-df = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/UK/keyword collection/ukpolitics.csv')
-
-# Concatenate title and body columns
-df['text'] = df['title'] + ' ' + df['body']
+# Load and preprocess data
+df = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/UK/keyword collection/cleaned_ukpolitics.csv')
 df['text'] = df['text'].fillna('')
 
-# Clean the text: remove URLs, special characters, and normalize text
-def clean_text(text):
-    text = re.sub(r'http\S+', '', text)  # Remove URLs
-    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)  # Remove special characters
-    text = text.lower()  # Convert to lowercase
-    return text
+# Initialize BERT model and tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertModel.from_pretrained('bert-base-uncased')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
 
-df['text'] = df['text'].apply(clean_text)
+# Initialize TF-IDF Vectorizer
+vectorizer = TfidfVectorizer(stop_words='english', min_df=0.01, max_df=0.7, ngram_range=(1, 2))
+tfidf = vectorizer.fit_transform(df['text'].values)
+tfidf_lookup = {word: vectorizer.idf_[i] for word, i in vectorizer.vocabulary_.items()}
 
-# Load spaCy transformer model
-nlp = spacy.load("en_core_web_trf")
+# Function to get BERT embeddings
+def get_bert_embeddings(text):
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, max_length=512)
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+    with torch.no_grad():
+        outputs = model(**inputs)
+    return outputs.last_hidden_state[:, 0, :].squeeze().cpu().numpy()
 
-# Initialize and fit the TF-IDF vectorizer
-vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['text'])
-tfidf_lookup = {key: vectorizer.idf_[value] for key, value in vectorizer.vocabulary_.items()}
+# Lemmatizer
+lemmatizer = WordNetLemmatizer()
+
+# Process text with BERT and apply TF-IDF weights
 vect = []
+for text in tqdm(df['text'].values):
+    lemmatized_text = ' '.join([lemmatizer.lemmatize(word) for word in word_tokenize(text.lower())])
+    embedding = get_bert_embeddings(lemmatized_text)
+    words = tokenizer.tokenize(lemmatized_text)
+    weighted_embedding = np.sum([tfidf_lookup.get(w, 0.5) * embedding for w in words], axis=0)
+    vect.append(weighted_embedding)
 
-# Processing text with spaCy and applying TF-IDF weights
-for doc in tqdm(nlp.pipe(df['text'], batch_size=10)):  # Adjust batch_size 
-    weighted_doc_tensor = []
-    for token in doc:
-        word_text = token.text.lower()
-        weight = tfidf_lookup.get(word_text, 0.5)  # Default weight if word not found
-        weighted_doc_tensor.append(token.vector * weight if token.has_vector else np.zeros((768,)))
-    if weighted_doc_tensor:  # Check if the document has content after processing
-        vect.append(np.mean(weighted_doc_tensor, axis=0))
-    else:
-        vect.append(np.zeros((768,)))  # Ensure all vectors have the same dimension
+vect = np.array(vect)
 
-vect = np.vstack(vect)
-
-# Dimensionality Reduction
-reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, metric='cosine') 
+# Dimensionality Reduction with UMAP
+reducer = umap.UMAP(n_neighbors=25, metric='cosine')
 embedding = reducer.fit_transform(vect)
 
-# Clustering
-clusterer = hdbscan.HDBSCAN(min_cluster_size=10, metric='euclidean', cluster_selection_method='eom')
+# Clustering with HDBSCAN
+clusterer = hdbscan.HDBSCAN(min_cluster_size=40, min_samples=1)
 labels = clusterer.fit_predict(embedding)
-
-# Attach clusters back to the DataFrame
 df['cluster'] = labels
 
-# Extracting key words for each cluster
+# Extract and print clusters and their keywords
 cluster_keywords = {}
 for cluster in set(labels):
     cluster_texts = df[df['cluster'] == cluster]['text'].values
@@ -65,7 +63,13 @@ for cluster in set(labels):
     summed_vectors = np.sum(vectorized_texts, axis=0)
     terms = vectorizer.get_feature_names_out()
     sorted_terms = np.argsort(summed_vectors).flatten()[::-1]
-    top_terms = [terms[idx] for idx in sorted_terms[:10]]
+    top_terms = [str(terms[idx]) for idx in sorted_terms[:50]]
     cluster_keywords[cluster] = top_terms
 
-print(cluster_keywords)
+# Save cluster keywords with top 50 terms to a CSV file
+cluster_df = pd.DataFrame.from_dict(cluster_keywords, orient='index')
+cluster_df.to_csv('cluster_keywords_top50.csv', header=False)
+
+# Print each cluster's top 10 keywords
+for cluster, keywords in cluster_keywords.items():
+    print(f"Cluster {cluster}: {', '.join(keywords[:10])}")

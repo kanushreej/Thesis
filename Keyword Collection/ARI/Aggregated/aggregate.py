@@ -2,11 +2,10 @@ import pandas as pd
 from glob import glob
 
 def aggregate_keywords(issue, base_dir):
-    # Find all relevant CSV files
-    csv_paths = glob(f"{base_dir}/Models/**/top_keywords_{issue.lower()}.csv", recursive=True)
+
+    csv_paths = glob(f"{base_dir}/Models/**/top_keywords_{issue.lower()}.csv", recursive=True)     # Find all relevant CSV files
     all_keywords = pd.DataFrame()
-    
-    # Loop through each file path
+
     for path in csv_paths:
         df = pd.read_csv(path)
 

@@ -10,7 +10,10 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 # Load and preprocess data
-df = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/UK/keyword collection/cleaned_ukpolitics.csv')
+df = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/UK/keyword collection/ukpolitics.csv')
+df['text'] = df['title'].fillna('') + ' ' + df['body'].fillna('')
+df['text'] = df['text'].str.replace(r'http\S+', '', regex=True)
+df['text'] = df['text'].str.replace(r'[^a-zA-Z\s]', '', regex=True)
 df['text'] = df['text'].fillna('')
 
 # Initialize BERT model and tokenizer
@@ -41,10 +44,14 @@ for text in tqdm(df['text'].values):
     lemmatized_text = ' '.join([lemmatizer.lemmatize(word) for word in word_tokenize(text.lower())])
     embedding = get_bert_embeddings(lemmatized_text)
     words = tokenizer.tokenize(lemmatized_text)
-    weighted_embedding = np.sum([tfidf_lookup.get(w, 0.5) * embedding for w in words], axis=0)
+    weighted_embedding = np.zeros(embedding.shape)  # Initialize with zeros to ensure same shape
+    for word in words:
+        weight = tfidf_lookup.get(word, 0.5)
+        weighted_embedding += weight * embedding
     vect.append(weighted_embedding)
 
-vect = np.array(vect)
+# Ensure all embeddings have the same shape before stacking
+vect = np.vstack(vect)
 
 # Dimensionality Reduction with UMAP
 reducer = umap.UMAP(n_neighbors=25, metric='cosine')
@@ -68,7 +75,7 @@ for cluster in set(labels):
 
 # Save cluster keywords with top 50 terms to a CSV file
 cluster_df = pd.DataFrame.from_dict(cluster_keywords, orient='index')
-cluster_df.to_csv('cluster_keywords_top50.csv', header=False)
+cluster_df.to_csv('lemamtized_keywords.csv', header=False)
 
 # Print each cluster's top 10 keywords
 for cluster, keywords in cluster_keywords.items():

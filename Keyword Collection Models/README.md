@@ -21,8 +21,8 @@ US:
 
 Both resources accessible on github and google drive
 
-Empath: Trained on reddit data
-Word2Vec: Uses a specific pretrained model called sense2vec which is trained on 2015 reddit data
+1. Empath: Trained on reddit data
+2. Word2Vec: Uses a specific pretrained model called sense2vec which is trained on 2015 reddit data
 
 
 

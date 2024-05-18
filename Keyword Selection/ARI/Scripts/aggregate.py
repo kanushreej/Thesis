@@ -25,5 +25,5 @@ def aggregate_keywords(issue, base_dir):
     return output_path
 
 # Update issue and local directory up to /Keyword Collection
-output_file_path = aggregate_keywords('HealthcareUK', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Collection')
+output_file_path = aggregate_keywords('IsraelPalestine', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
 print(f"Aggregated keywords are saved in: {output_file_path}")

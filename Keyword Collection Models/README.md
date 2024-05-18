@@ -16,7 +16,7 @@ US:
 2. Healthcare US - Healthcare
 3. Taxation US - Tax
 4. Climate Change US - Climate
-5. Immigration US - Immigration
+5. Immigration US - USCIS (when I use immigration, all it gives me is stuff related to the EU; hence this specific keyword)
 
 ## Data that the models are trained on 
 

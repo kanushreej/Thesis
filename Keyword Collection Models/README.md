@@ -13,7 +13,7 @@ UK:
 
 US:
 1. IsraelPalestine - Israel, Palestine
-2. Healthcare US - 
+2. Healthcare US - Healthcare
 3. Taxation US - Tax
 4. Climate Change US - Climate
 5. Immigration US - Immigration
@@ -24,6 +24,10 @@ Both resources accessible on github and google drive
 
 1. Empath: Trained on reddit data
 2. Word2Vec: Uses a specific pretrained model called sense2vec which is trained on 2015 reddit data
+
+## Why I think both models provide similar data
+Not that this section is too important, but both models are trained on reddit data and one is trained specifically on 2015 data (making it a subset to the other). This along with the fact that the models use the same csv files and even if there are different words provided by the model itself, they are probably not present in the CSV files. In later stages, there could be possibility where we directly use keywords from the model. 
+
 
 
 

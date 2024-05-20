@@ -36,5 +36,5 @@ def label_keywords(issue, moderator, base_dir):
     labeled_keywords.to_csv(labeled_path, index=False)
     print("All keywords have been labeled and saved.")
 
-base_directory = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Collection/ARI'  # Update this to your actual directory path up to /ARI
-label_keywords('HealthcareUK', 'Bob', base_directory)
+base_directory = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/ARI'  # Update this to your actual directory path up to /ARI
+label_keywords('Brexit', 'Adam', base_directory)

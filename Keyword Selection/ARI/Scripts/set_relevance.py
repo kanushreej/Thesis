@@ -3,8 +3,8 @@ import os
 
 def label_keywords(issue, moderator, base_dir):
 
-    aggregated_path = f"{base_dir}/Aggregated/{issue}.csv"
-    labeled_path = f"{base_dir}/Labelled/{issue}_{moderator}.csv"
+    aggregated_path = f"{base_dir}/Aggregated/aggregated_keywords_{issue}.csv"
+    labeled_path = f"{base_dir}/Labelled/labelled_{issue}_{moderator}.csv"
     
     if os.path.exists(labeled_path):
         labeled_keywords = pd.read_csv(labeled_path)

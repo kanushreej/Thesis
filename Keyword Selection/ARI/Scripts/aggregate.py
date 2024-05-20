@@ -11,6 +11,7 @@ def aggregate_keywords(issue, base_dir):
 
         if 'Keyword' in df.columns:
             df = df[['Keyword']]
+            df['Keyword'] = df['Keyword'].str.lower()
         else:
             print(f"Warning: 'Keyword' column not found in {path}. Skipping.")
             continue
@@ -19,11 +20,11 @@ def aggregate_keywords(issue, base_dir):
     
     all_keywords.drop_duplicates(subset='Keyword', keep='first', inplace=True)
 
-    output_path = f"{base_dir}/ARI/Aggregated/{issue}.csv"
+    output_path = f"{base_dir}/ARI/Aggregated/aggregated_keywords_{issue}.csv"
     all_keywords.to_csv(output_path, index=False)
 
     return output_path
 
 # Update issue and local directory up to /Keyword Collection
-output_file_path = aggregate_keywords('IsraelPalestine', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
+output_file_path = aggregate_keywords('TaxationUS', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
 print(f"Aggregated keywords are saved in: {output_file_path}")

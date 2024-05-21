@@ -67,12 +67,12 @@ health,1.0
 care,0.0
 nursing,1.0
 obesity,1.0
-endoscopy,0
+endoscopy,0.0
 sleep,0.0
 life,0.0
 hipaa,1.0
 universal,0.0
-colonoscopy,0
+colonoscopy,0.0
 nurse,1.0
 texas,0.0
 public,0.0
@@ -93,7 +93,7 @@ cost,0.0
 admin,0.0
 heart,0.0
 detachment,0.0
-obese,1
+obese,1.0
 california,0.0
 meaid,1.0
 equity,0.0
@@ -118,7 +118,7 @@ deductible,1.0
 medicaid reimbursements,1.0
 sorry,0.0
 deductible insurance,1.0
-echocardiogram,0
+echocardiogram,0.0
 yes,0.0
 healthcare costs,1.0
 company,0.0

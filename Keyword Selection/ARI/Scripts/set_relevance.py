@@ -37,4 +37,4 @@ def label_keywords(issue, moderator, base_dir):
     print("All keywords have been labeled and saved.")
 
 base_directory = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/ARI'  # Update this to your actual directory path up to /ARI
-label_keywords('ClimateChangeUS', 'Adam', base_directory)
+label_keywords('HealthcareUS', 'Adam', base_directory)

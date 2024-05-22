@@ -6,9 +6,9 @@ irs,0
 taxable,1
 taxed,1
 federal,1
-fees,1
+fees,0
 deductions,1
-withheld,1
+withheld,0
 pensions,1
 paye,1
 taxpayer,1
@@ -27,16 +27,16 @@ interest,1
 u.s.,0
 taxing,1
 salary,1
-treasury,0
+treasury,1
 filing,1
 wealthy,0
-financial,1
+financial,0
 deducting,1
 exemptions,1
-insurance,1
+insurance,0
 debt,1
 monthly,0
-revenue,0
+revenue,1
 corporations,0
 equity,0
 loan,1
@@ -45,8 +45,8 @@ investment,1
 payable,0
 govt,0
 employer,0
-payments,1
-expenses,1
+payments,0
+expenses,0
 allowance,1
 deduction,1
 deduct,1
@@ -60,16 +60,16 @@ pre-tax,1
 cashback,1
 post-tax,1
 annuity,1
-15.3%,0
+15.3%,1
 premiums,1
 pretax,1
-shortfall,0
-7.65%,0
+shortfall,1
+7.65%,1
 mortage,1
 20k,0
 vat.,1
 windfall,1
-6.2%,0
+6.2%,1
 expenditures,1
 time,0
 people,0
@@ -104,7 +104,7 @@ hsbc,0
 employment,0
 company,0
 accountant,0
-pay,1
+pay,0
 sum,0
 inheritance,0
 employed,0
@@ -121,7 +121,7 @@ pages wiki,0
 finance credit,1
 https ukpersonal,0
 savings account,1
-ukpersonal finance,1
+ukpersonal finance,0
 thank,0
 yes,0
 finance savings,1
@@ -129,14 +129,14 @@ isa,1
 credit score,1
 tax rate,1
 tax return,1
-uk,1
+uk,0
 pay tax,1
 tax year,0
-money,1
+money,0
 points shown,0
 pay taxes,1
 years,0
-ukpersonalfinance,1
+ukpersonalfinance,0
 op,0
 don,0
 did,0
@@ -147,7 +147,7 @@ student loans,1
 rate tax,1
 taxable income,1
 self employed,0
-capital gains,0
+capital gains,1
 months,0
 know,0
 2023,0

@@ -5,7 +5,7 @@ education,0
 medicaid,1
 housing,0
 welfare,1
-government,1
+government,0
 hospitals,1
 medicare,1
 govt,0
@@ -14,10 +14,10 @@ subsidies,1
 tax,0
 taxes,0
 subsidized,1
-labor,1
+labor,0
 obamacare,1
 privatized,1
-administration,1
+administration,0
 economic,0
 nhs,0
 pensions,0
@@ -35,16 +35,16 @@ health-care,1
 disability,1
 jobs,0
 benefits,1
-industry,1
+industry,0
 privatization,1
 manufacturing,0
 unemployment,0
-funding,1
+funding,0
 subsidization,1
-corporations,1
-taxpayer,1
-taxation,1
-taxpayers,1
+corporations,0
+taxpayer,0
+taxation,0
+taxpayers,0
 gov,0
 aca,1
 subsidize,1
@@ -84,7 +84,7 @@ aetna,1
 reason,0
 cancer,1
 primary,0
-preventative,1
+preventative,0
 market,0
 reddit,0
 retinal,0
@@ -93,7 +93,7 @@ cost,0
 admin,0
 heart,0
 detachment,0
-obese,1
+obese,0
 california,0
 meaid,0
 equity,0
@@ -102,7 +102,7 @@ google,0
 new,0
 home,0
 emergency,1
-payer,1
+payer,0
 primary care,1
 health insurance,1
 hospital,1

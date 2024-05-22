@@ -3,14 +3,14 @@ nhs,1
 6,0
 nhs.,1
 medical,1
-scotland,1
+scotland,0
 labour,0
 hospital,1
-tories,1
-govt,1
+tories,0
+govt,0
 tory,1
 government,1
-gov,1
+gov,0
 bbc,1
 privatisation,1
 healthcare,1
@@ -19,17 +19,17 @@ snp,1
 mps,1
 privatised,1
 westminster,1
-brexit,1
+brexit,0
 council,0
 committee,0
 pfi,1
 privatise,1
-conservative,1
+conservative,0
 dwp,1
 funding,1
 audit,0
 parliament,1
-conservatives,1
+conservatives,0
 medicare,1
 education,0
 gum,0
@@ -49,7 +49,7 @@ subsidised,1
 subsidise,1
 austerity,0
 privatising,1
-taxpayers,1
+taxpayers,0
 privatized,1
 subsidising,1
 pensioners,0
@@ -83,18 +83,18 @@ reg,0
 doctor,1
 inflation,1
 pay,0
-radiology,1
+radiology,0
 leave,0
 care,0
 surgery,1
 strike,1
 mental,0
 england,1
-deanery,0
+deanery,1
 nursing,1
 reason,0
 rota,1
-public,1
+public,0
 school,0
 surgeon,1
 sector,0
@@ -124,7 +124,7 @@ gp,1
 giphy,0
 gif giphy,0
 doctorsuk questions,0
-uk,1
+uk,0
 doctors,1
 just,0
 bma,1
@@ -133,7 +133,7 @@ thank,0
 medical school,0
 like,0
 thanks,0
-ward,0
+ward,1
 yes,0
 know,0
 trust,0

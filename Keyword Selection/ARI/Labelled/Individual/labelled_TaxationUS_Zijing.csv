@@ -2,9 +2,9 @@ Keyword,Relevant
 tax,1
 income,1
 taxes,1
-federal,1
+federal,0
 irs,1
-rich,1
+rich,0
 u.s.,0
 corporations,1
 healthcare,0
@@ -37,9 +37,9 @@ richer,0
 insurance,0
 subsidy,0
 medicaid,0
-unemployment,1
+unemployment,0
 wage,1
-payers,0
+payers,1
 expenditures,0
 spending,0
 payments,0
@@ -69,7 +69,7 @@ allowance,1
 excise,1
 "6,000",0
 "200,000",0
-7.65%,0
+7.65%,1
 outlays,1
 pretax,1
 payable,1
@@ -84,10 +84,10 @@ sub,0
 market,0
 biden,0
 russia,0
-wealth,1
+wealth,0
 japan,0
 california,0
-rate,1
+rate,0
 government,0
 food,0
 economy,1
@@ -98,7 +98,7 @@ property,1
 minimum,1
 reddit,0
 return,1
-cost,1
+cost,0
 canada,0
 stock,0
 capitalism,0
@@ -108,7 +108,7 @@ energy,1
 deflation,1
 world,0
 security,0
-living,1
+living,0
 401k,1
 economics,0
 change,0
@@ -134,11 +134,11 @@ sales tax,1
 don,0
 money,0
 fed,0
-housing prices,0
+housing prices,1
 population,0
-housing costs,0
+housing costs,1
 know,0
-cost living,0
+cost living,1
 years,0
 tax rate,1
 right,0

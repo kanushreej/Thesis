@@ -4,8 +4,8 @@ from sklearn.metrics import adjusted_rand_score
 import numpy as np
 
 def calculate_ari_matrix(issue, dir):
-
-    file_paths = [os.path.join(dir, f) for f in os.listdir(dir) if issue in f and f.endswith('.csv')]
+    labels_dir = os.path.join(dir, "Labelled/Individual")
+    file_paths = [os.path.join(labels_dir, f) for f in os.listdir(labels_dir) if issue in f and f.endswith('.csv')]
     
     labels_data = []
     for i, file in enumerate(file_paths):
@@ -30,7 +30,9 @@ def calculate_ari_matrix(issue, dir):
                 ari_matrix[j, i] = ari_matrix[i, j] 
 
     ari_df = pd.DataFrame(ari_matrix, index=moderators, columns=moderators)
+    output_file_path = os.path.join(dir, f'Discrepant/Matrices/ari_matrix_{issue}.csv')
+    ari_df.to_csv(output_file_path)
     print(ari_df)
 
 # Update issue and local directory up to /Labelled
-calculate_ari_matrix('HealthcareUK', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Collection/ARI/Labelled')
+calculate_ari_matrix('TaxationUK', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/ARI')

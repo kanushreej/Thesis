@@ -40,20 +40,20 @@ representative,1
 embassy/consulate,1
 notary,1
 dmv.,0
-taxpayer,1
+taxpayer,0
 agreement,0
-cbsa,0
+cbsa,1
 notarized,1
 residency,1
 employer,1
-filing,1
+filing,0
 cbp,1
 issued,0
 registration,1
 greencard,1
 daca,1
 audit,1
-administration,1
+administration,0
 courts,1
 administrative,1
 visas,1
@@ -75,11 +75,11 @@ us,1
 states,1
 fraud,1
 germany,0
-parole,1
+parole,0
 birth,0
 japan,0
 waiver,0
-asylum,0
+asylum,1
 philippines,0
 permanent,0
 france,0
@@ -92,7 +92,7 @@ lottery,0
 entry,0
 reason,0
 petition,0
-law,1
+law,0
 resident,1
 marriage,1
 right,0
@@ -129,7 +129,7 @@ years,0
 stay,0
 expired passport,1
 canadian,0
-american,1
+american,0
 did,0
 need,0
 lol,0

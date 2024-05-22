@@ -2,10 +2,10 @@ Keyword,Relevant
 tax,1
 income,1
 taxes,1
-federal,1
+federal,0
 irs,1
 rich,0
-u.s.,1
+u.s.,0
 corporations,0
 healthcare,0
 wealthy,0
@@ -17,10 +17,10 @@ taxation,1
 subsidies,1
 housing,0
 taxing,1
-fees,1
+fees,0
 billionaires,0
 medicare,0
-govt,1
+govt,0
 taxpayer,1
 0,0
 taxpayers,1
@@ -34,17 +34,17 @@ interest,1
 fica,1
 debt,1
 richer,0
-insurance,1
+insurance,0
 subsidy,1
 medicaid,0
 unemployment,0
 wage,1
-payers,1
+payers,0
 expenditures,1
-spending,1
-payments,1
+spending,0
+payments,0
 savings,1
-expenses,1
+expenses,0
 deduction,1
 earnings,1
 deduct,1
@@ -60,7 +60,7 @@ mortgage,1
 deducting,1
 annuity,1
 pre-tax,1
-shortfall,0
+shortfall,1
 "50,000",0
 "4,000",0
 post-tax,1
@@ -69,7 +69,7 @@ allowance,1
 excise,1
 "6,000",0
 "200,000",0
-7.65%,0
+7.65%,1
 outlays,1
 pretax,1
 payable,1
@@ -122,7 +122,7 @@ bot action,0
 read article,0
 fx9crj rules_roundtable_redux_rule_vi_and_offtopic,0
 comments automatically,0
-social security,0
+social security,1
 lol,0
 just,0
 income tax,1
@@ -132,8 +132,8 @@ yes,0
 like,0
 sales tax,1
 don,0
-money,1
-fed,1
+money,0
+fed,0
 housing prices,0
 population,0
 housing costs,0
@@ -154,5 +154,5 @@ wages,1
 prices,0
 deficit,0
 article,0
-pay,1
+pay,0
 student loans,1

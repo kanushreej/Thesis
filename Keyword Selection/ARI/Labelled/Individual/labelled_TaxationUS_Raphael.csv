@@ -4,9 +4,9 @@ income,1
 taxes,1
 federal,1
 irs,1
-rich,1
-u.s.,1
-corporations,1
+rich,0
+u.s.,0
+corporations,0
 healthcare,0
 wealthy,0
 taxed,1
@@ -20,7 +20,7 @@ taxing,1
 fees,1
 billionaires,1
 medicare,0
-govt,1
+govt,0
 taxpayer,1
 0,0
 taxpayers,1
@@ -81,7 +81,7 @@ china,0
 thesis,0
 automod,0
 sub,0
-market,1
+market,0
 biden,1
 russia,0
 wealth,1
@@ -108,7 +108,7 @@ energy,0
 deflation,1
 world,0
 security,0
-living,1
+living,0
 401k,1
 economics,1
 change,0
@@ -132,7 +132,7 @@ yes,0
 like,0
 sales tax,1
 don,0
-money,1
+money,0
 fed,0
 housing prices,1
 population,0

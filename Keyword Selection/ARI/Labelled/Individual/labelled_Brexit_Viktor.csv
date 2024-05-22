@@ -10,10 +10,10 @@ Farage,1
 tories,1
 Conservatives,1
 elections,1
-parliamentary,1
+parliamentary,0
 FPTP,1
-coalition,1
-Westminster,1
+coalition,0
+Westminster,0
 EEA,1
 WTO,1
 ECHR,1
@@ -22,29 +22,29 @@ UKIP,1
 reforms,1
 EEC,1
 Greece,0
-reunification,0
+reunification,1
 MEP,1
-SNP,1
+SNP,0
 undemocratic,0
 austerity,0
 Immigration,1
 referendums,1
 UKIP.,1
-Greens,1
+Greens,0
 Labor,1
 referenda,1
 eurozone,1
-ECB,0
-LibDems,1
+ECB,1
+LibDems,0
 Unionist,1
 FPTP.,1
 IMF,1
 Eurozone,1
-devolution,1
+devolution,0
 Ukip,1
 Referendum,1
 Elections,1
-Coalition,1
+Coalition,0
 parliaments,1
 federalism,0
 Draghi,0
@@ -62,23 +62,23 @@ federalization,0
 privatisation,0
 E.U.,1
 plebiscite,1
-ECB.,0
+ECB.,1
 Nigel_Farage,1
 federalisation,0
 Holyrood,1
-Miliband,1
+Miliband,0
 people,1
 time,0
 reddit,0
-market,1
+market,0
 single,0
-Ireland,1
-democracy,1
+Ireland,0
+democracy,0
 France,0
 European,1
 Europe,1
-Northern,1
-Leave,1
+Northern,0
+Leave,0
 movement,1
 Spain,0
 Russia,0
@@ -89,10 +89,10 @@ Ukraine,0
 euro,1
 freedom,1
 right,1
-government,1
-trade,1
-London,1
-England,1
+government,0
+trade,0
+London,0
+England,0
 Canada,0
 tax,1
 Single,1
@@ -114,7 +114,7 @@ Nigel,1
 party,1
 brexit,1
 wing,1
-compose brexit,1
+compose brexit,0
 bot action,0
 civil discussion,0
 uk,1
@@ -123,17 +123,17 @@ familiarise subs,0
 eu,1
 archive,0
 just,0
-british,1
+british,0
 like,0
 tory,1
-europeanunion questions,1
+europeanunion questions,0
 boris,1
 single market,1
 farage,1
 brexit benefit,1
 voted,1
-ireland,1
-vote,1
+ireland,0
+vote,0
 contact moderators,0
 yes,0
 article,0
@@ -141,10 +141,10 @@ note politico,1
 labour,1
 think,0
 rejoin,1
-brexit means,1
+brexit means,0
 brexiters,1
 lol,0
-britain,1
+britain,0
 clickbait,0
 eu membership,1
 know,0
@@ -158,4 +158,4 @@ did,0
 https archive,0
 rejoin eu,1
 benefit,1
-irish,1
+irish,0

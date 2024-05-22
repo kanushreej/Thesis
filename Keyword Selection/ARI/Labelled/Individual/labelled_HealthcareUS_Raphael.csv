@@ -5,24 +5,24 @@ education,0
 medicaid,1
 housing,0
 welfare,1
-government,1
+government,0
 hospitals,1
 medicare,1
-govt,1
+govt,0
 insurance,1
 subsidies,0
-tax,1
-taxes,1
+tax,0
+taxes,0
 subsidized,1
 labor,0
 obamacare,1
 privatized,1
-administration,1
+administration,0
 economic,0
 nhs,0
 pensions,0
 immigration,0
-gov't,1
+gov't,0
 ubi,0
 business,0
 income,0
@@ -39,13 +39,13 @@ industry,0
 privatization,1
 manufacturing,0
 unemployment,0
-funding,1
+funding,0
 subsidization,1
-corporations,1
-taxpayer,1
-taxation,1
-taxpayers,1
-gov,1
+corporations,0
+taxpayer,0
+taxation,0
+taxpayers,0
+gov,0
 aca,1
 subsidize,1
 subsidy,1
@@ -55,11 +55,11 @@ single-payer,0
 defunding,1
 aca.,1
 deregulating,1
-deregulate,1
+deregulate,0
 entitlements,1
 privatizing,1
 ubi.,0
-tax-payer,1
+tax-payer,0
 nhs.,0
 time,0
 people,0
@@ -75,7 +75,7 @@ universal,1
 colonoscopy,0
 nurse,1
 texas,1
-public,1
+public,0
 canada,0
 united,0
 copay,1
@@ -88,8 +88,8 @@ preventative,0
 market,0
 reddit,0
 retinal,0
-private,1
-cost,1
+private,0
+cost,0
 admin,0
 heart,0
 detachment,0
@@ -118,7 +118,7 @@ deductible,1
 medicaid reimbursements,1
 sorry,0
 deductible insurance,1
-echocardiogram,1
+echocardiogram,0
 yes,0
 healthcare costs,1
 company,0

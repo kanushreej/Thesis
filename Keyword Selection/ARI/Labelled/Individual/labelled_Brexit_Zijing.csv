@@ -22,7 +22,7 @@ UKIP,1
 reforms,0
 EEC,0
 Greece,1
-reunification,0
+reunification,1
 MEP,1
 SNP,1
 undemocratic,0
@@ -30,12 +30,12 @@ austerity,0
 Immigration,1
 referendums,1
 UKIP.,1
-Greens,1
+Greens,0
 Labor,1
 referenda,1
 eurozone,0
-ECB,0
-LibDems,1
+ECB,1
+LibDems,0
 Unionist,0
 FPTP.,1
 IMF,0
@@ -55,14 +55,14 @@ eurosceptics,1
 Austerity,0
 rUK,0
 Juncker,1
-CETA,0
+CETA,1
 TTIP,0
 SNP.,0
 federalization,0
 privatisation,0
 E.U.,1
 plebiscite,1
-ECB.,0
+ECB.,1
 Nigel_Farage,1
 federalisation,0
 Holyrood,0
@@ -86,7 +86,7 @@ Union,0
 Germany,0
 Brussels,0
 Ukraine,0
-euro,0
+euro,1
 freedom,0
 right,0
 government,0
@@ -104,11 +104,11 @@ Boris,1
 europe,1
 free,0
 China,0
-sovereignty,0
+sovereignty,1
 Poland,0
 wikipedia,0
-Johnson,0
-europa,0
+Johnson,1
+europa,1
 reason,0
 Nigel,1
 party,0
@@ -152,7 +152,7 @@ don,0
 stupid,0
 nigel,1
 https,0
-freedom movement,0
+freedom movement,1
 good,0
 did,0
 https archive,0

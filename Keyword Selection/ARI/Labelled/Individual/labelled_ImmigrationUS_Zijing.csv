@@ -42,7 +42,7 @@ notary,0
 dmv.,0
 taxpayer,1
 agreement,0
-cbsa,0
+cbsa,1
 notarized,0
 residency,1
 employer,0
@@ -75,7 +75,7 @@ us,0
 states,0
 fraud,0
 germany,0
-parole,1
+parole,0
 birth,0
 japan,0
 waiver,0
@@ -137,7 +137,7 @@ op,0
 work permit,1
 speech xenophobia,1
 know,0
-usa,1
+usa,0
 sponsor,1
 lawyer,0
-work authorization,0
+work authorization,1

@@ -84,7 +84,7 @@ fuel,1
 fossil,1
 sustainability,1
 china,0
-power,1
+power,0
 heat,1
 world,0
 ocean,1
@@ -95,7 +95,7 @@ methane,1
 nature,1
 water,0
 green,0
-sea,0
+sea,1
 snow,0
 footprint,1
 electricity,0

@@ -10,7 +10,7 @@ fees,0
 deductions,0
 withheld,0
 pensions,1
-paye,0
+paye,1
 taxpayer,1
 rich,0
 0,0
@@ -38,7 +38,7 @@ debt,1
 monthly,1
 revenue,1
 corporations,0
-equity,0
+equity,1
 loan,1
 healthcare,0
 investment,0
@@ -63,13 +63,13 @@ annuity,0
 15.3%,0
 premiums,0
 pretax,1
-shortfall,0
-7.65%,0
+shortfall,1
+7.65%,1
 mortage,1
 20k,0
 vat.,1
-windfall,0
-6.2%,0
+windfall,1
+6.2%,1
 expenditures,0
 time,0
 people,0
@@ -110,7 +110,7 @@ inheritance,1
 employed,1
 withholding,1
 gift,0
-gambling,1
+gambling,0
 life,1
 email,0
 finance pensions,0
@@ -121,7 +121,7 @@ pages wiki,0
 finance credit,0
 https ukpersonal,0
 savings account,1
-ukpersonal finance,1
+ukpersonal finance,0
 thank,0
 yes,0
 finance savings,1
@@ -142,7 +142,7 @@ don,0
 did,0
 tax code,0
 just,0
-1099,0
+1099,1
 student loans,0
 rate tax,1
 taxable income,1

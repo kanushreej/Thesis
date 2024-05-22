@@ -12,7 +12,7 @@ arab,0
 idf,1
 israelis,1
 arabs,1
-iran,1
+iran,0
 muslim,1
 bibi,1
 netanyahu,1
@@ -27,7 +27,7 @@ islamic,1
 jerusalem,1
 christian,1
 british,1
-iranian,1
+iranian,0
 pro-israel,1
 saudi,1
 islam,1
@@ -106,7 +106,7 @@ qatar,0
 war,1
 east,0
 middle,0
-jordan,1
+jordan,0
 action,0
 right,0
 wikipedia,0

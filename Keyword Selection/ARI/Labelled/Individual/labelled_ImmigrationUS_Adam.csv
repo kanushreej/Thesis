@@ -34,7 +34,7 @@ subpoena,0.0
 customs,1.0
 itin,1.0
 issuance,1.0
-affidavit,1.0
+affidavit,0.0
 authorize,0.0
 representative,0.0
 embassy/consulate,1.0
@@ -135,7 +135,7 @@ need,0.0
 lol,0.0
 op,0.0
 work permit,1.0
-speech xenophobia,0.0
+speech xenophobia,1.0
 know,0.0
 usa,0.0
 sponsor,1.0

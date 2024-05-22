@@ -25,4 +25,4 @@ def modify_relevance(issue, moderator, base_dir):
     print("Modifications saved.")
 
 # Update issue and local directory up to /Keyword Collection
-modify_relevance('TaxationUS', 'Adam', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
+modify_relevance('Brexit', 'Adam', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')

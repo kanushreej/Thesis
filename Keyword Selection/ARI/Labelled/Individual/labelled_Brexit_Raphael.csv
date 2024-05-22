@@ -10,9 +10,9 @@ Farage,1
 tories,1
 Conservatives,1
 elections,1
-parliamentary,1
+parliamentary,0
 FPTP,1
-coalition,1
+coalition,0
 Westminster,1
 EEA,1
 WTO,1
@@ -24,18 +24,18 @@ EEC,1
 Greece,0
 reunification,1
 MEP,1
-SNP,1
+SNP,0
 undemocratic,1
-austerity,1
+austerity,0
 Immigration,1
 referendums,1
 UKIP.,1
-Greens,1
+Greens,0
 Labor,1
 referenda,1
 eurozone,1
-ECB,0
-LibDems,1
+ECB,1
+LibDems,0
 Unionist,1
 FPTP.,1
 IMF,1
@@ -44,7 +44,7 @@ devolution,0
 Ukip,1
 Referendum,1
 Elections,1
-Coalition,1
+Coalition,0
 parliaments,1
 federalism,1
 Draghi,0
@@ -52,17 +52,17 @@ Opposition,0
 Eurosceptics,1
 eurosceptic,1
 eurosceptics,1
-Austerity,1
+Austerity,0
 rUK,0
 Juncker,0
-CETA,0
+CETA,1
 TTIP,0
 SNP.,1
 federalization,0
 privatisation,0
 E.U.,1
 plebiscite,1
-ECB.,0
+ECB.,1
 Nigel_Farage,1
 federalisation,0
 Holyrood,0
@@ -72,8 +72,8 @@ time,0
 reddit,0
 market,0
 single,0
-Ireland,1
-democracy,1
+Ireland,0
+democracy,0
 France,0
 European,1
 Europe,1
@@ -89,10 +89,10 @@ Ukraine,0
 euro,0
 freedom,0
 right,0
-government,1
+government,0
 trade,1
 London,1
-England,1
+England,0
 Canada,0
 tax,0
 Single,0
@@ -128,11 +128,11 @@ like,0
 tory,1
 europeanunion questions,0
 boris,1
-single market,0
+single market,1
 farage,1
 brexit benefit,1
 voted,0
-ireland,1
+ireland,0
 vote,0
 contact moderators,0
 yes,0
@@ -144,7 +144,7 @@ rejoin,0
 brexit means,0
 brexiters,1
 lol,0
-britain,1
+britain,0
 clickbait,0
 eu membership,1
 know,0
@@ -158,4 +158,4 @@ did,0
 https archive,0
 rejoin eu,1
 benefit,0
-irish,1
+irish,0

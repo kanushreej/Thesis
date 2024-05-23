@@ -8,7 +8,7 @@ reddit = praw.Reddit(
     client_id='vInV29b0TXkkpagkYMoPLQ',
     client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
     user_agent='adam'
-) # DONT FORGET TO UPDATE THIS
+)
 
 def collect_data(subreddit, keyword, start_date):
     """Collect posts and comments from a specific subreddit based on a keyword from a specific start date."""
@@ -34,7 +34,7 @@ def collect_data(subreddit, keyword, start_date):
                 'subreddit': subreddit,
                 'type': 'comment',
                 'keyword': keyword,
-                'id': str(comment.id),  # Convert ID to string
+                'id': str(comment.id),
                 'author': str(comment.author),
                 'title': '',
                 'body': comment.body,
@@ -46,17 +46,13 @@ def collect_data(subreddit, keyword, start_date):
 def main():
     start_year = 2010
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
+    subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
+                  'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
+                  'brexit', 'europeanunion']
 
-    subreddits = [
-    'unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
-    'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
-    'brexit', 'europeanunion'
-    ] # Change to regional subreddits
- 
-    issues = ['HealthcareUK', 'TaxationUK'] # Change to issues to collect
-
-    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final" # Update path to your /Final
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK" #update path to your /Subreddit Data/{region}
+    issues = ['HealthcareUK', 'TaxationUK']
+    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 
     for issue in issues:
         csv_path = os.path.join(data_dir, f"{issue}_data.csv")
@@ -64,9 +60,13 @@ def main():
 
         if not os.path.exists(csv_path):
             pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv(csv_path, index=False)
+        else:
+            df = pd.read_csv(csv_path, dtype={'id': str})
+            df['id'] = df['id'].astype(str)  # Ensure 'id' is string
+            df.to_csv(csv_path, index=False)
 
         keywords = pd.read_csv(keyword_file)['Keyword'].tolist()
-        existing_ids = pd.read_csv(csv_path, dtype={'id': str})['id'].tolist() if os.path.exists(csv_path) else []
+        existing_ids = pd.read_csv(csv_path, dtype={'id': str})['id'].tolist()
         existing_ids_set = set(existing_ids)
 
         for subreddit in subreddits:

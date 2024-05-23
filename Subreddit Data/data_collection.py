@@ -47,21 +47,33 @@ def main():
     start_year = 2010
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
 
-    subreddits = ['subreddit1', 'subreddit2']  # Replace with subreddits
-    issues = ['Brexit', 'ClimateChange']  # Replace with issues to collect
+    subreddits = [
+        'unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
+        'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'Israel',
+        'Palestine', 'IsraelPalestine', 'israelexposed', 'AskMiddleEast', 'nhs',
+        'doctorsUK', 'NursingUK', 'JuniorDoctorsUK', 'UKHealthcare', 'TaxUK', 'tax',
+        'UKPersonalFinance', 'ukaccounting', 'economy', 'brexit', 'BrexitAteMyFace',
+        'europeanunion', 'EuropeanFederalists', 'eu', 'climate', 'environment',
+        'climatechange', 'sustainability', 'ClimateOffensive', 'ClimateActionPlan',
+        'climateskeptics'
+    ] # Change to regional subreddits
 
-    base_dir = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final' # Change path up to /Keyword Selection/Final
-    csv_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK'  # Change path up to /Subreddit Data/Region
-    if not os.path.exists(csv_path):
-        pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv(csv_path, index=False)
+    issues = ['HealthcareUK', 'TaxationUK'] # Change to issues to collect
 
-    existing_ids = pd.read_csv(csv_path)['id'].tolist()
-    existing_ids_set = set(existing_ids)
+    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 
     for issue in issues:
-        keyword_file = f'{base_dir}/{issue}_final_keywords.csv'
+        csv_path = os.path.join(data_dir, f"{issue}_data.csv")
+        keyword_file = os.path.join(base_dir, f"{issue}_final_keywords.csv")
+
+        if not os.path.exists(csv_path):
+            pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv(csv_path, index=False)
+
         keywords = pd.read_csv(keyword_file)['Keyword'].tolist()
-        
+        existing_ids = pd.read_csv(csv_path)['id'].tolist() if os.path.exists(csv_path) else []
+        existing_ids_set = set(existing_ids)
+
         for subreddit in subreddits:
             for keyword in keywords:
                 try:

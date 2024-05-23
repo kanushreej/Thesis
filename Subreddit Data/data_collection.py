@@ -48,16 +48,11 @@ def main():
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
 
     subreddits = [
-        'unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
-        'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'Israel',
-        'Palestine', 'IsraelPalestine', 'israelexposed', 'AskMiddleEast', 'nhs',
-        'doctorsUK', 'NursingUK', 'JuniorDoctorsUK', 'UKHealthcare', 'TaxUK', 'tax',
-        'UKPersonalFinance', 'ukaccounting', 'economy', 'brexit', 'BrexitAteMyFace',
-        'europeanunion', 'EuropeanFederalists', 'eu', 'climate', 'environment',
-        'climatechange', 'sustainability', 'ClimateOffensive', 'ClimateActionPlan',
-        'climateskeptics'
+    'unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
+    'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
+    'brexit', 'europeanunion'
     ] # Change to regional subreddits
-
+ 
     issues = ['HealthcareUK', 'TaxationUK'] # Change to issues to collect
 
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final" # Update path to your /Final

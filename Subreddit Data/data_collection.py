@@ -60,8 +60,8 @@ def main():
 
     issues = ['HealthcareUK', 'TaxationUK'] # Change to issues to collect
 
-    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
+    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final" # Update path to your /Final
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK" #update path to your /Subreddit Data/{region}
 
     for issue in issues:
         csv_path = os.path.join(data_dir, f"{issue}_data.csv")

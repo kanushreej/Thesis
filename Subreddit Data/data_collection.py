@@ -8,7 +8,7 @@ reddit = praw.Reddit(
     client_id='vInV29b0TXkkpagkYMoPLQ',
     client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
     user_agent='adam'
-)
+) # DONT FORGET TO UPDATE THIS
 
 def collect_data(subreddit, keyword, start_date):
     """Collect posts and comments from a specific subreddit based on a keyword from a specific start date."""

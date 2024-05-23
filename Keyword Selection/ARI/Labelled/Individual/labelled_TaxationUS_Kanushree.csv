@@ -34,17 +34,17 @@ interest,1.0
 fica,1.0
 debt,1.0
 richer,0.0
-insurance,1.0
+insurance,0.0
 subsidy,1.0
 medicaid,0.0
 unemployment,0.0
 wage,1.0
-payers,1.0
+payers,0.0
 expenditures,1.0
-spending,1.0
-payments,1.0
+spending,0.0
+payments,0.0
 savings,1.0
-expenses,1.0
+expenses,0.0
 deduction,1.0
 earnings,1.0
 deduct,1.0
@@ -60,7 +60,7 @@ mortgage,0.0
 deducting,1.0
 annuity,1.0
 pre-tax,1.0
-shortfall,0.0
+shortfall,1.0
 "50,000",0.0
 "4,000",0.0
 post-tax,1.0
@@ -81,13 +81,13 @@ china,0.0
 thesis,0.0
 automod,0.0
 sub,0.0
-market,1.0
+market,0.0
 biden,0.0
 russia,0.0
 wealth,0.0
 japan,0.0
 california,0.0
-rate,1.0
+rate,0.0
 government,0.0
 food,0.0
 economy,1.0
@@ -98,9 +98,9 @@ property,0.0
 minimum,0.0
 reddit,0.0
 return,0.0
-cost,1.0
+cost,0.0
 canada,0.0
-stock,1.0
+stock,0.0
 capitalism,1.0
 house,0.0
 fast,0.0
@@ -110,9 +110,9 @@ world,0.0
 security,0.0
 living,0.0
 401k,1.0
-economics,1.0
+economics,0.0
 change,0.0
-rent,1.0
+rent,0.0
 free,0.0
 walmart,0.0
 price,0.0
@@ -132,13 +132,13 @@ yes,0.0
 like,0.0
 sales tax,1.0
 don,0.0
-money,1.0
+money,0.0
 fed,1.0
-housing prices,1.0
+housing prices,0.0
 population,0.0
-housing costs,1.0
+housing costs,0.0
 know,0.0
-cost living,1.0
+cost living,0.0
 years,0.0
 tax rate,1.0
 right,0.0
@@ -154,5 +154,5 @@ wages,1.0
 prices,1.0
 deficit,1.0
 article,0.0
-pay,1.0
+pay,0.0
 student loans,1.0

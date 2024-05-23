@@ -17,12 +17,12 @@ environmental,1.0
 ipcc,1.0
 impacts,0.0
 noaa,1.0
-deniers,0.0
+deniers,1.0
 anthropogenic,1.0
 0,0.0
 temperature,1.0
 oil,0.0
-denier,0.0
+denier,1.0
 geological,1.0
 ecological,1.0
 alarmists,0.0
@@ -35,7 +35,7 @@ greenhouse,1.0
 gas,0.0
 coal,0.0
 political,0.0
-skeptics,0.0
+skeptics,1.0
 times,0.0
 atmospheric,0.0
 climates,0.0
@@ -106,7 +106,7 @@ west,0.0
 nuke,0.0
 biden,0.0
 democracy,0.0
-ice,0.0
+ice,1.0
 propaganda,0.0
 japan,0.0
 states,0.0
@@ -132,7 +132,7 @@ fossil fuels,1.0
 right,0.0
 good,0.0
 agree,0.0
-green,1.0
+green,0.0
 point,0.0
 did,0.0
 co2 atmosphere,1.0

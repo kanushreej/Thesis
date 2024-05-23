@@ -22,14 +22,14 @@ westminster,0.0
 brexit,0.0
 council,0.0
 committee,0.0
-pfi,0.0
+pfi,1.0
 privatise,1.0
-conservative,1.0
+conservative,0.0
 dwp,1.0
 funding,1.0
 audit,0.0
 parliament,0.0
-conservatives,1.0
+conservatives,0.0
 medicare,1.0
 education,0.0
 gum,0.0
@@ -48,7 +48,7 @@ welfare,1.0
 subsidised,0.0
 subsidise,0.0
 austerity,0.0
-privatising,0.0
+privatising,1.0
 taxpayers,0.0
 privatized,1.0
 subsidising,1.0
@@ -61,7 +61,7 @@ subsidises,1.0
 hs2,0.0
 ukip,0.0
 subsidy,1.0
-nationalising,0.0
+nationalising,1.0
 privatize,1.0
 nationalise,0.0
 holyrood,0.0
@@ -83,14 +83,14 @@ reg,0.0
 doctor,1.0
 inflation,0.0
 pay,0.0
-radiology,0.0
+radiology,1.0
 leave,0.0
 care,0.0
 surgery,1.0
 strike,0.0
-mental,1.0
+mental,0.0
 england,0.0
-deanery,0.0
+deanery,1.0
 nursing,1.0
 reason,0.0
 rota,0.0
@@ -112,7 +112,7 @@ med,1.0
 radiologist,1.0
 stroke,1.0
 registrar,0.0
-juniordoctorsuk questions,1.0
+juniordoctorsuk questions,0.0
 subscribing doctorsuk,1.0
 14y1vb1 important_moderation_update_closure_of_jduk,0.0
 pa,0.0
@@ -133,7 +133,7 @@ thank,0.0
 medical school,1.0
 like,0.0
 thanks,0.0
-ward,0.0
+ward,1.0
 yes,0.0
 know,0.0
 trust,0.0

@@ -27,27 +27,27 @@ interest,1.0
 u.s.,0.0
 taxing,1.0
 salary,1.0
-treasury,0.0
+treasury,1.0
 filing,0.0
 wealthy,0.0
-financial,1.0
+financial,0.0
 deducting,1.0
 exemptions,0.0
-insurance,1.0
+insurance,0.0
 debt,1.0
 monthly,0.0
 revenue,1.0
 corporations,0.0
-equity,0.0
+equity,1.0
 loan,1.0
 healthcare,0.0
 investment,1.0
 payable,1.0
 govt,0.0
 employer,0.0
-payments,1.0
-expenses,1.0
-allowance,1.0
+payments,0.0
+expenses,0.0
+allowance,0.0
 deduction,1.0
 deduct,1.0
 earnings,1.0
@@ -68,7 +68,7 @@ shortfall,1.0
 mortage,1.0
 20k,0.0
 vat.,1.0
-windfall,0.0
+windfall,1.0
 6.2%,1.0
 expenditures,1.0
 time,0.0
@@ -87,24 +87,24 @@ red,0.0
 london,0.0
 california,0.0
 refund,0.0
-fund,1.0
+fund,0.0
 rent,0.0
 inflation,1.0
 bank,1.0
 index,1.0
-capital,1.0
+capital,0.0
 card,0.0
 estate,0.0
 assessment,0.0
-crypto,1.0
+crypto,0.0
 car,0.0
-market,1.0
+market,0.0
 code,0.0
 hsbc,0.0
 employment,0.0
 company,0.0
-accountant,1.0
-pay,1.0
+accountant,0.0
+pay,0.0
 sum,0.0
 inheritance,1.0
 employed,0.0
@@ -121,7 +121,7 @@ pages wiki,0.0
 finance credit,1.0
 https ukpersonal,0.0
 savings account,1.0
-ukpersonal finance,1.0
+ukpersonal finance,0.0
 thank,0.0
 yes,0.0
 finance savings,1.0
@@ -132,7 +132,7 @@ tax return,1.0
 uk,0.0
 pay tax,1.0
 tax year,1.0
-money,1.0
+money,0.0
 points shown,0.0
 pay taxes,1.0
 years,0.0
@@ -142,7 +142,7 @@ don,0.0
 did,0.0
 tax code,1.0
 just,0.0
-1099,1.0
+1099,0.0
 student loans,1.0
 rate tax,1.0
 taxable income,1.0

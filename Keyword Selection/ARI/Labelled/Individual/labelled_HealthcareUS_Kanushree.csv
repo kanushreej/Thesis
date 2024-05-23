@@ -52,10 +52,10 @@ subsidy,1.0
 subsidizing,1.0
 expenditures,0.0
 single-payer,1.0
-defunding,0.0
+defunding,1.0
 aca.,1.0
-deregulating,0.0
-deregulate,0.0
+deregulating,1.0
+deregulate,1.0
 entitlements,1.0
 privatizing,1.0
 ubi.,0.0
@@ -93,9 +93,9 @@ cost,0.0
 admin,0.0
 heart,0.0
 detachment,0.0
-obese,0.0
+obese,1.0
 california,0.0
-meaid,0.0
+meaid,1.0
 equity,0.0
 asthma,1.0
 google,0.0
@@ -137,7 +137,7 @@ mental health,1.0
 medicaid population,1.0
 expensive,0.0
 medical debt,1.0
-radiation,1.0
+radiation,0.0
 private insurance,1.0
 reimbursement rates,1.0
 doctors,1.0

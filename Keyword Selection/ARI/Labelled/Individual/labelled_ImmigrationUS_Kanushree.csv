@@ -26,15 +26,15 @@ citizenship,1.0
 dmv,0.0
 dept,0.0
 i-9,1.0
-foia,0.0
+foia,1.0
 irs.,1.0
 ssn.,1.0
 agency,0.0
 subpoena,0.0
 customs,1.0
 itin,1.0
-issuance,0.0
-affidavit,0.0
+issuance,1.0
+affidavit,1.0
 authorize,0.0
 representative,0.0
 embassy/consulate,1.0
@@ -70,7 +70,7 @@ work,0.0
 immigrant,1.0
 citizen,1.0
 india,0.0
-mexico,1.0
+mexico,0.0
 us,0.0
 states,0.0
 fraud,0.0
@@ -79,7 +79,7 @@ parole,0.0
 birth,0.0
 japan,0.0
 waiver,0.0
-asylum,0.0
+asylum,1.0
 philippines,0.0
 permanent,0.0
 france,0.0
@@ -117,7 +117,7 @@ apply,0.0
 b1 b2,1.0
 country,0.0
 permanent resident,1.0
-immigration questions,1.0
+immigration questions,0.0
 just,0.0
 h1b,1.0
 violating following,0.0
@@ -129,7 +129,7 @@ years,0.0
 stay,0.0
 expired passport,1.0
 canadian,0.0
-american,1.0
+american,0.0
 did,0.0
 need,0.0
 lol,0.0
@@ -138,6 +138,6 @@ work permit,1.0
 speech xenophobia,0.0
 know,0.0
 usa,0.0
-sponsor,0.0
+sponsor,1.0
 lawyer,0.0
-work authorization,0.0
+work authorization,1.0

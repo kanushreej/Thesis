@@ -21,7 +21,7 @@ def collect_data(subreddit, keyword, start_date):
             'subreddit': subreddit,
             'type': 'post',
             'keyword': keyword,
-            'id': submission.id,
+            'id': str(submission.id),  
             'author': str(submission.author),
             'title': submission.title,
             'body': submission.selftext,
@@ -34,7 +34,7 @@ def collect_data(subreddit, keyword, start_date):
                 'subreddit': subreddit,
                 'type': 'comment',
                 'keyword': keyword,
-                'id': comment.id,
+                'id': str(comment.id),  # Convert ID to string
                 'author': str(comment.author),
                 'title': '',
                 'body': comment.body,
@@ -71,7 +71,7 @@ def main():
             pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv(csv_path, index=False)
 
         keywords = pd.read_csv(keyword_file)['Keyword'].tolist()
-        existing_ids = pd.read_csv(csv_path)['id'].tolist() if os.path.exists(csv_path) else []
+        existing_ids = pd.read_csv(csv_path, dtype={'id': str})['id'].tolist() if os.path.exists(csv_path) else []
         existing_ids_set = set(existing_ids)
 
         for subreddit in subreddits:

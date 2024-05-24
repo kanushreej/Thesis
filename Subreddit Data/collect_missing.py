@@ -83,5 +83,5 @@ def main():
 
     verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date)
 
-if name == ‘main’:
+if __name__ == '__main__':
     main()

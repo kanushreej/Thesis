@@ -5,8 +5,8 @@ import shutil
 import tkinter as tk
 from tkinter import messagebox
 
-original_file = 'Subreddit Data/UK/Israel-Palestine/Israel-Palestine.csv' # PLEASE CHANGE FILENAME IF NEEDED
-copy_file = 'Subreddit Data/UK/Israel-Palestine/Labelled.csv' # PLEASE CHANGE FILENAME IF NEEDEd
+original_file = 'Subreddit Data/UK/Israel-Palestine/IsraelPalestine.csv' # PLEASE CHANGE FILENAME IF NEEDED
+copy_file = 'Annotation/UK/Adam/IsraelPalestine_labelled.csv' # PLEASE CHANGE FILENAME IF NEEDED
 progress_file = 'progress.json'
 
 if not os.path.exists(copy_file):
@@ -17,9 +17,11 @@ df = pd.read_csv(copy_file)
 pd.set_option('display.max_colwidth', None)
 
 new_columns = [
-    'pro_israel', 'pro_palestine',  
-    'public_healthcare', 'private_healthcare',  
-    'high_tax', 'low_tax',  
+    'pro_brexit','anti_brexit',
+    'pro_climateAction','anti_climateAction',
+    'public_healthcare', 'private_healthcare',
+    'pro_israel', 'pro_palestine',    
+    'increase_tax', 'decrease_tax',  
     'neutral', 'irrelevant'  
 ]
 

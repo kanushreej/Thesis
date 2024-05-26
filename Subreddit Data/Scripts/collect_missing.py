@@ -5,9 +5,9 @@ from datetime import datetime, timezone, timedelta
 import time
 
 reddit = praw.Reddit(
-    client_id='vInV29b0TXkkpagkYMoPLQ',
-    client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
-    user_agent='adam'
+    client_id='wEP3RUiICi5YvjDKhEKlkg',
+    client_secret='FP8O4SUc6ocAGNgCx5HB1-nczz6uQw',
+    user_agent='script:keyword_extractor:v1.0 (by u/Queasy-Parsnip-8103)'
 )
 
 def collect_data(subreddit, keyword, start_date):
@@ -74,12 +74,14 @@ def main():
     start_year = 2010
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
 
-    subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
-                  'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
-                  'brexit', 'europeanunion']
-    issues = ['HealthcareUK', 'TaxationUK']
-    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
+    subreddits = [
+        "Politics", "Conservative", "Geopolitics", "Libertarian", "Democrats", "PoliticalDiscussion", "GreenParty", "Republican", "Neoliberal", "Liberal", 
+        "Conservatives", "Climatechange", "Healthcare", "Progressive", "USpolitics"
+    ]
+
+    issues = ['HealthcareUS', 'TaxationUS']
+    base_dir = r"C:\Users\vshap\OneDrive\Desktop\work\code\python\Thesis\Thesis\Keyword Selection\Final"
+    data_dir = r"C:\Users\vshap\OneDrive\Desktop\work\code\python\Thesis\Thesis\Subreddit Data\US"
 
     verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date)
 

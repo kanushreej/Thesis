@@ -1,33 +1,46 @@
 import pandas as pd
+import os
 from sklearn.metrics import cohen_kappa_score
 
-file1 = 'UKhealthcare_extracopy.csv' #change file names!!!
-file2 = 'UKhealthcare_copy.csv' #change file names!!!
+moderator1_file = 'Annotation/UK/Adam/IsraelPalestine_labelled.csv' # Change as needed
+moderator2_file = 'Annotation/UK/AnotherModerator/IsraelPalestine_labelled.csv' # Change as needed
 
-def calculate_kappa_score(file1, file2):
-    # Read the CSV files into DataFrames
-    df1 = pd.read_csv(file1)
-    df2 = pd.read_csv(file2)
+# Columns containing the labels
+label_columns = [
+    'pro_brexit', 'anti_brexit',
+    'pro_climateAction', 'anti_climateAction',
+    'public_healthcare', 'private_healthcare',
+    'pro_israel', 'pro_palestine',    
+    'increase_tax', 'decrease_tax',  
+    'neutral', 'irrelevant'  
+]
 
-    df1.fillna(-1, inplace=True)
-    df2.fillna(-1, inplace=True)
-    
-    # Extract true labels from the columns
-    true_labels1 = df1[['public', 'private', 'neutral', 'irrelevant']].values #change column names!!!
-    true_labels2 = df2[['public', 'private', 'neutral', 'irrelevant']].values #change column names!!!
-    
-    # Flatten the arrays for cohen_kappa_score
-    true_labels1 = true_labels1.flatten()
-    true_labels2 = true_labels2.flatten()
-    
-    # Calculate Cohen's Kappa score
-    kappa_score = cohen_kappa_score(true_labels1, true_labels2)
-    
-    return kappa_score
+df_moderator1 = pd.read_csv(moderator1_file, dtype={'id': str})
+df_moderator2 = pd.read_csv(moderator2_file, dtype={'id': str})
 
-if __name__ == "__main__":
-    
-    # Calculate Cohen's Kappa score
-    kappa_score = calculate_kappa_score(file1,file2)
-    
-    print(f"Cohen's Kappa Score: {kappa_score}")
+df_moderator1.sort_values(by=['id'], inplace=True)
+df_moderator2.sort_values(by=['id'], inplace=True)
+
+df_moderator1.reset_index(drop=True, inplace=True)
+df_moderator2.reset_index(drop=True, inplace=True)
+
+merged_df = pd.merge(df_moderator1, df_moderator2, on='id', suffixes=('_mod1', '_mod2'))
+
+for column in label_columns:
+    merged_df = merged_df.dropna(subset=[f"{column}_mod1", f"{column}_mod2"])
+
+
+kappa_scores = {}
+for column in label_columns:
+    if f"{column}_mod1" in merged_df.columns and f"{column}_mod2" in merged_df.columns:
+        kappa = cohen_kappa_score(merged_df[f"{column}_mod1"], merged_df[f"{column}_mod2"])
+        kappa_scores[column] = kappa
+    else:
+        kappa_scores[column] = 'N/A'
+
+for column, kappa in kappa_scores.items():
+    print(f"Cohen's kappa for {column}: {kappa}")
+
+valid_kappa_scores = [k for k in kappa_scores.values() if k != 'N/A']
+average_kappa = sum(valid_kappa_scores) / len(valid_kappa_scores) if valid_kappa_scores else 'N/A'
+print(f"Average Cohen's kappa score: {average_kappa}")

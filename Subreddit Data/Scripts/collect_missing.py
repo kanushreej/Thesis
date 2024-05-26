@@ -5,9 +5,9 @@ from datetime import datetime, timezone, timedelta
 import time
 
 reddit = praw.Reddit(
-    client_id='your_client_id',
-    client_secret='your_client_secret',
-    user_agent='your_user_agent'
+    client_id='vInV29b0TXkkpagkYMoPLQ',
+    client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
+    user_agent='adam'
 )
 
 def collect_data(subreddit, keyword, start_date):

@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from sklearn.metrics import cohen_kappa_score
 
-# Paths to the labeled data files
 moderator1_file = 'Annotation/UK/Adam/IsraelPalestine_labelled.csv' # Change as needed
 moderator2_file = 'Annotation/UK/AnotherModerator/IsraelPalestine_labelled.csv' # Change as needed
 
@@ -16,8 +15,8 @@ label_columns = [
     'neutral', 'irrelevant'  
 ]
 
-df_moderator1 = pd.read_csv(moderator1_file)
-df_moderator2 = pd.read_csv(moderator2_file)
+df_moderator1 = pd.read_csv(moderator1_file, dtype={'id': str})
+df_moderator2 = pd.read_csv(moderator2_file, dtype={'id': str})
 
 df_moderator1.sort_values(by=['id'], inplace=True)
 df_moderator2.sort_values(by=['id'], inplace=True)
@@ -25,10 +24,16 @@ df_moderator2.sort_values(by=['id'], inplace=True)
 df_moderator1.reset_index(drop=True, inplace=True)
 df_moderator2.reset_index(drop=True, inplace=True)
 
+merged_df = pd.merge(df_moderator1, df_moderator2, on='id', suffixes=('_mod1', '_mod2'))
+
+for column in label_columns:
+    merged_df = merged_df.dropna(subset=[f"{column}_mod1", f"{column}_mod2"])
+
+
 kappa_scores = {}
 for column in label_columns:
-    if column in df_moderator1.columns and column in df_moderator2.columns:
-        kappa = cohen_kappa_score(df_moderator1[column], df_moderator2[column])
+    if f"{column}_mod1" in merged_df.columns and f"{column}_mod2" in merged_df.columns:
+        kappa = cohen_kappa_score(merged_df[f"{column}_mod1"], merged_df[f"{column}_mod2"])
         kappa_scores[column] = kappa
     else:
         kappa_scores[column] = 'N/A'

@@ -1,8 +1,15 @@
 import pandas as pd
 import os
 
-original_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv'  # PLEASE CHANGE FILENAME IF NEEDED
+original_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/HealthcareUK_data.csv'  # PLEASE CHANGE FILENAME IF NEEDED
 
+def prompt_overwrite(file_path):
+    while True:
+        response = input(f"Do you want to overwrite the original file {file_path}? (yes/no): ").strip().lower()
+        if response in ['yes', 'no']:
+            return response == 'yes'
+        else:
+            print("Please respond with 'yes' or 'no'.")
 
 if os.path.exists(original_file):
     df = pd.read_csv(original_file, dtype=str)
@@ -14,13 +21,6 @@ if os.path.exists(original_file):
     print("Number of NaN values in each column before conversion:")
     print(df.isna().sum())
 
-    df['created_utc'] = pd.to_datetime(df['created_utc'], errors='coerce')
-    print("Converted created_utc to datetime:")
-    print(df.head())
-
-    print("Number of NaN values in each column after conversion:")
-    print(df.isna().sum())
-
     df.dropna(subset=['subreddit', 'keyword', 'created_utc'], inplace=True)
     print(f"Data after dropping rows with NaNs in crucial columns: {len(df)} records.")
     
@@ -28,14 +28,12 @@ if os.path.exists(original_file):
     print(df.isna().sum())
     
     df.sort_values(by=['subreddit', 'keyword', 'created_utc'], inplace=True, na_position='last')
-    print("Data sorted:")
-    print(df.head())
-    
     df.reset_index(drop=True, inplace=True)
-    print("Data index reset:")
-    print(df.head())
-    
-    df.to_csv(original_file, index=False)
-    print(f"Cleaned and sorted data saved back to {original_file}.")
+
+    if prompt_overwrite(original_file):
+        df.to_csv(original_file, index=False)
+        print(f"Cleaned and sorted data saved back to {original_file}.")
+    else:
+        print("Operation cancelled. The original file was not overwritten.")
 else:
     raise FileNotFoundError(f"The original file {original_file} does not exist.")

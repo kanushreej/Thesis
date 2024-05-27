@@ -77,7 +77,7 @@ def main():
     subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
                   'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
                   'brexit', 'europeanunion']
-    issues = ['Brexit', 'ClimateChangeUK']
+    issues = ['HealthcareUK','TaxationUK']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
     data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 

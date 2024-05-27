@@ -10,13 +10,21 @@ def count_posts_comments(issue, data_dir):
 
     df = pd.read_csv(csv_path, dtype={'id': str})
 
+    # Print the columns of the DataFrame for debugging
+    print("Columns in the DataFrame:", df.columns)
+
+    # Check if 'type' column exists
+    if 'type' not in df.columns:
+        print("Error: 'type' column not found in the DataFrame.")
+        return 0, 0
+
     total_posts = df[df['type'] == 'post'].shape[0]
     total_comments = df[df['type'] == 'comment'].shape[0]
 
     return total_posts, total_comments
 
 # Update issue and local directory up to /Keyword Collection
-issue = 'TaxationUK'  
+issue = 'HealthcareUK'  
 data_dir = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK'
 
 total_posts, total_comments = count_posts_comments(issue, data_dir)

@@ -15,8 +15,8 @@ def collect_data(subreddit, keyword, start_date):
     data = []
     for submission in reddit.subreddit(subreddit).search(keyword, sort='new', limit=None):
         created_date = datetime.fromtimestamp(submission.created_utc, tz=timezone.utc)
-        if created_date < start_date:
-            break
+        if created_date < start_date or not submission.author or not subreddit or not keyword:
+            continue
         data.append({
             'subreddit': subreddit,
             'type': 'post',

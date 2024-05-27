@@ -18,29 +18,33 @@ def collect_data(subreddit, keyword, start_date):
             created_date = datetime.fromtimestamp(submission.created_utc, tz=timezone.utc)
             if created_date < start_date:
                 break
-            data.append({
-                'subreddit': subreddit,
-                'type': 'post',
-                'keyword': keyword,
-                'id': str(submission.id),
-                'author': str(submission.author),
-                'title': submission.title,
-                'body': submission.selftext,
-                'created_utc': created_date.isoformat()
-            })
+            # Check if submission author is not None
+            if submission.author:
+                data.append({
+                    'subreddit': subreddit,
+                    'type': 'post',
+                    'keyword': keyword,
+                    'id': str(submission.id),
+                    'author': str(submission.author),
+                    'title': submission.title,
+                    'body': submission.selftext,
+                    'created_utc': created_date.isoformat()
+                })
 
             submission.comments.replace_more(limit=0)
             for comment in submission.comments.list():
-                data.append({
-                    'subreddit': subreddit,
-                    'type': 'comment',
-                    'keyword': keyword,
-                    'id': str(comment.id),
-                    'author': str(comment.author),
-                    'title': '',
-                    'body': comment.body,
-                    'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
-                })
+                # Check if comment author is not None
+                if comment.author:
+                    data.append({
+                        'subreddit': subreddit,
+                        'type': 'comment',
+                        'keyword': keyword,
+                        'id': str(comment.id),
+                        'author': str(comment.author),
+                        'title': '',
+                        'body': comment.body,
+                        'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
+                    })
         return data
     except praw.exceptions.APIException as e:
         print(f"API Exception for {subreddit} with keyword {keyword}: {e}")

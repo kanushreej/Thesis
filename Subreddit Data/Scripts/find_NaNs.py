@@ -21,7 +21,7 @@ if os.path.exists(original_file):
     print("Number of NaN values in each column before conversion:")
     print(df.isna().sum())
 
-    df.dropna(subset=['subreddit', 'keyword', 'created_utc'], inplace=True)
+    df.dropna(subset=['subreddit', 'keyword', 'created_utc', 'author'], inplace=True)
     print(f"Data after dropping rows with NaNs in crucial columns: {len(df)} records.")
     
     print("Number of NaN values in each column after dropping rows:")

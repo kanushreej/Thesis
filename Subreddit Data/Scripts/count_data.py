@@ -24,7 +24,7 @@ def count_posts_comments(issue, data_dir):
     return total_posts, total_comments
 
 # Update issue and local directory up to /Keyword Collection
-issue = 'HealthcareUK'  
+issue = 'IsraelPalestineUK'  
 data_dir = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK'
 
 total_posts, total_comments = count_posts_comments(issue, data_dir)

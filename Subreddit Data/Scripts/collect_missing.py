@@ -16,35 +16,34 @@ def collect_data(subreddit, keyword, start_date):
     try:
         for submission in reddit.subreddit(subreddit).search(keyword, sort='new', limit=None):
             created_date = datetime.fromtimestamp(submission.created_utc, tz=timezone.utc)
-            if created_date < start_date:
-                break
-            # Check if submission author is not None
-            if submission.author:
-                data.append({
-                    'subreddit': subreddit,
-                    'type': 'post',
-                    'keyword': keyword,
-                    'id': str(submission.id),
-                    'author': str(submission.author),
-                    'title': submission.title,
-                    'body': submission.selftext,
-                    'created_utc': created_date.isoformat()
-                })
+            if created_date < start_date or not submission.author or not subreddit or not keyword:
+                continue
+
+            data.append({
+                'subreddit': subreddit,
+                'type': 'post',
+                'keyword': keyword,
+                'id': str(submission.id),
+                'author': str(submission.author) if submission.author else None,
+                'title': submission.title,
+                'body': submission.selftext,
+                'created_utc': created_date.isoformat()
+            })
 
             submission.comments.replace_more(limit=0)
             for comment in submission.comments.list():
-                # Check if comment author is not None
-                if comment.author:
-                    data.append({
-                        'subreddit': subreddit,
-                        'type': 'comment',
-                        'keyword': keyword,
-                        'id': str(comment.id),
-                        'author': str(comment.author),
-                        'title': '',
-                        'body': comment.body,
-                        'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
-                    })
+                if not comment.author or not subreddit or not keyword:
+                    continue
+                data.append({
+                    'subreddit': subreddit,
+                    'type': 'comment',
+                    'keyword': keyword,
+                    'id': str(comment.id),
+                    'author': str(comment.author) if comment.author else None,
+                    'title': '',
+                    'body': comment.body,
+                    'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
+                })
         return data
     except praw.exceptions.APIException as e:
         print(f"API Exception for {subreddit} with keyword {keyword}: {e}")
@@ -81,7 +80,7 @@ def main():
     subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
                   'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
                   'brexit', 'europeanunion']
-    issues = ['HealthcareUK','TaxationUK']
+    issues = ['HealthcareUK', 'TaxationUK', 'IsraelPalestineUK']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
     data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 

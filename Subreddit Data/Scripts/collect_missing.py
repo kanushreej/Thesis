@@ -74,14 +74,12 @@ def main():
     start_year = 2010
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
 
-    subreddits = [
-        "Politics", "Conservative", "Geopolitics", "Libertarian", "Democrats", "PoliticalDiscussion", "GreenParty", "Republican", "Neoliberal", "Liberal", 
-        "Conservatives", "Climatechange", "Healthcare", "Progressive", "USpolitics"
-    ]
-
-    issues = ['HealthcareUS', 'TaxationUS']
-    base_dir = r"C:\Users\vshap\OneDrive\Desktop\work\code\python\Thesis\Thesis\Keyword Selection\Final"
-    data_dir = r"C:\Users\vshap\OneDrive\Desktop\work\code\python\Thesis\Thesis\Subreddit Data\US"
+    subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
+                  'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
+                  'brexit', 'europeanunion']
+    issues = ['Brexit', 'ClimateChangeUK']
+    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 
     verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date)
 

@@ -55,7 +55,7 @@ def collect_data(subreddit, keyword, start_date):
 
 def verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date):
     for issue in issues:
-        csv_path = os.path.join(data_dir, f"{issue}UK_data.csv")
+        csv_path = os.path.join(data_dir, f"{issue}_data.csv")
         keyword_file = os.path.join(base_dir, f"{issue}_final_keywords.csv")
         keywords = pd.read_csv(keyword_file)['Keyword'].tolist()
 
@@ -77,12 +77,14 @@ def main():
     start_year = 2010
     start_date = datetime(start_year, 1, 1, tzinfo=timezone.utc)
 
-    subreddits = ['unitedkingdom', 'ukpolitics', 'AskUK', 'Scotland', 'Wales', 'northernireland',
-                  'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
-                  'brexit', 'europeanunion']
-    issues = ['IsraelPalestine']
+    subreddits = [ 'Politics', 'Conservative', 'Geopolitics', 'Libertarian', 'Democrats',
+    'PoliticalDiscussion', 'GreenParty', 'Republican', 'Neoliberal', 'Liberal',
+    'Conservatives', 'Climatechange', 'Healthcare', 'Progressive', 'USpolitics'
+    ]
+
+    issues = ['ImmigrationUS']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/US"
 
     verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date)
 

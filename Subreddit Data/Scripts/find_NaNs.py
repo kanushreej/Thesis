@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-original_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/TaxationUK_data.csv'  # PLEASE CHANGE FILENAME IF NEEDED
+original_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/US/ImmigrationUS_data.csv'  # PLEASE CHANGE FILENAME IF NEEDED
 
 def prompt_overwrite(file_path):
     while True:

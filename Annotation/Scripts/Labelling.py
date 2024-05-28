@@ -5,8 +5,8 @@ import shutil
 import tkinter as tk
 from tkinter import messagebox
 
-original_file = 'Subreddit Data/UK/Israel-Palestine/IsraelPalestine.csv' # PLEASE CHANGE FILENAME IF NEEDED
-copy_file = 'Annotation/UK/Adam/IsraelPalestine_labelled.csv' # PLEASE CHANGE FILENAME IF NEEDED
+original_file = r'C:\Users\vshap\OneDrive\Desktop\work\code\Thesis\Thesis\Subreddit Data\US\HealthcareUS_data_0.1%.csv' # PLEASE CHANGE FILENAME IF NEEDED
+copy_file = r'C:\Users\vshap\OneDrive\Desktop\work\code\Thesis\Thesis\Annotation\US\Viktor\HealthcareLabelled.csv' # PLEASE CHANGE FILENAME IF NEEDED
 progress_file = 'progress.json'
 
 if not os.path.exists(copy_file):
@@ -113,12 +113,16 @@ class LabelingApp:
         self.next_button = tk.Button(self.buttons_frame, text="Next →", command=self.next_data)
         self.next_button.grid(row=len(self.new_columns) + 2, column=0, pady=10, sticky="ew")
 
+        self.counter_label = tk.Label(self.frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='gray', fg='white')
+        self.counter_label.grid(row=len(self.df.columns), column=0, columnspan=3, pady=10)
+
     def display_current_data(self):
         row = self.df.iloc[self.current_index]
         for column, value in row.items():
             if column in self.labels:
                 self.labels[column].config(text=f"{column}: {value}")
         self.reset_label_buttons()
+        self.counter_label.config(text=f"Data Point: {self.current_index + 1}/{len(self.df)}")
 
     def reset_label_buttons(self):
         for column in self.new_columns:
@@ -126,24 +130,24 @@ class LabelingApp:
             self.selected_labels[column] = value
             relevant_button, irrelevant_button = self.label_buttons[column]
             if value == 1:
-                relevant_button.config(relief=tk.SUNKEN)
-                irrelevant_button.config(relief=tk.RAISED)
+                relevant_button.config(relief=tk.SUNKEN, bg='light green')
+                irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
             elif value == 0:
-                relevant_button.config(relief=tk.RAISED)
-                irrelevant_button.config(relief=tk.SUNKEN)
+                relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+                irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
             else:
-                relevant_button.config(relief=tk.RAISED)
-                irrelevant_button.config(relief=tk.RAISED)
+                relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+                irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
 
     def set_label(self, column, value):
         self.selected_labels[column] = value
         relevant_button, irrelevant_button = self.label_buttons[column]
         if value == 1:
-            relevant_button.config(relief=tk.SUNKEN)
-            irrelevant_button.config(relief=tk.RAISED)
+            relevant_button.config(relief=tk.SUNKEN, bg='light green')
+            irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
         else:
-            relevant_button.config(relief=tk.RAISED)
-            irrelevant_button.config(relief=tk.SUNKEN)
+            relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+            irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
 
     def mark_labels(self):
         for column, value in self.selected_labels.items():
@@ -170,46 +174,3 @@ if __name__ == "__main__":
     app = LabelingApp(root)
     root.protocol("WM_DELETE_WINDOW", app.quit)
     root.mainloop()
-
-#try:
-#    unique_keywords = df['keyword'].unique()
-#    max_keyword_index = len(unique_keywords) - 1
-#    keyword_index = 0
-#    
-#    while True:
-#        while True:
-#            row = df.iloc[start_index]
-#            if row['keyword'] == unique_keywords[keyword_index]:
-#                break
-#            start_index = (start_index + 1) % len(df)
-#        
-#        print(f"\nData Point: {start_index}")
-#        print(f"subreddit: {row['subreddit']}")
-#        print(f"type: {row['type']}")
-#        print(f"keyword: {row['keyword']}")
-#        print(f"id: {row['id']}")
-#        print(f"author: {row['author']}")
-#        print(f"title: {row['title']}")
-#        print(f"body: {row['body']}")
-#        print(f"created_utc: {row['created_utc']}")
-#        
-#        for column in new_columns:
-#            input_value = input(f"Value for {column} or 'q' to quit: ")
-#            if input_value.lower() == 'q':
-#                save_progress(start_index)
-#                print("Progress saved, exiting.")
-#                exit(0)
-#            try:
-#                new_value = int(input_value)
-#                df.at[start_index, column] = new_value
-#            except ValueError:
-#                print("Please enter a valid integer.")
-#        
-#        df.to_csv(copy_file, index=False)
-#        
-#        keyword_index = (keyword_index + 1) % (max_keyword_index + 1)
-#        start_index = (start_index + 1) % len(df)
-#        
-#except KeyboardInterrupt:
-#    save_progress(start_index)
-#    print("Progress saved, exiting due to interrupt.")

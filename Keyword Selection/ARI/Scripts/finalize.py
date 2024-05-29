@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 def compile_final_keywords(issue, base_dir):
-    labeled_dir = f"{base_dir}/ARI/Labelled/Individual"
+    labeled_dir = f"{base_dir}/ARI/Labelled"
     file_paths = [os.path.join(labeled_dir, f) for f in os.listdir(labeled_dir) if issue in f]
     data_frames = [pd.read_csv(file) for file in file_paths]
     
@@ -15,4 +15,4 @@ def compile_final_keywords(issue, base_dir):
     print(f"Final keywords saved to {final_path}")
 
 # Update issue and local directory up to /Keyword Collection
-compile_final_keywords('HealthcareUK', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
+compile_final_keywords('TaxationUS', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')

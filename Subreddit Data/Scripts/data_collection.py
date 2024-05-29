@@ -25,7 +25,8 @@ def collect_data(subreddit, keyword, start_date):
             'author': str(submission.author),
             'title': submission.title,
             'body': submission.selftext,
-            'created_utc': created_date.isoformat()
+            'created_utc': created_date.isoformat(),
+            'parent_id': ''  # No parent for posts
         })
 
         submission.comments.replace_more(limit=0)
@@ -38,7 +39,8 @@ def collect_data(subreddit, keyword, start_date):
                 'author': str(comment.author),
                 'title': '',
                 'body': comment.body,
-                'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
+                'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat(),
+                'parent_id': str(comment.parent_id)  # Parent ID for comments
             })
 
     return data
@@ -51,7 +53,7 @@ def main():
     'Conservatives', 'Climatechange', 'Healthcare', 'Progressive', 'USpolitics'
     ]
 
-    issues = ['ImmigrationUS']
+    issues = ['ClimateChangeUS','HealthcareUS','IsraelPalestine','Taxation']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
     data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/US"
 
@@ -60,7 +62,7 @@ def main():
         keyword_file = os.path.join(base_dir, f"{issue}_final_keywords.csv")
 
         if not os.path.exists(csv_path):
-            pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc']).to_csv(csv_path, index=False)
+            pd.DataFrame(columns=['subreddit', 'type', 'keyword', 'id', 'author', 'title', 'body', 'created_utc', 'parent_id']).to_csv(csv_path, index=False)
         else:
             df = pd.read_csv(csv_path, dtype={'id': str})
             df['id'] = df['id'].astype(str)  # Ensure 'id' is string
@@ -85,4 +87,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

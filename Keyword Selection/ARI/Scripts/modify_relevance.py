@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 def modify_relevance(issue, moderator, base_dir):
-    dir = f"{base_dir}/ARI/Labelled/Individual/labelled_{issue}_{moderator}.csv"
+    dir = f"{base_dir}/ARI/Labelled/labelled_{issue}_{moderator}.csv"
     if not os.path.exists(dir):
         print("No labeled data found for this moderator.")
         return
@@ -25,4 +25,4 @@ def modify_relevance(issue, moderator, base_dir):
     print("Modifications saved.")
 
 # Update issue and local directory up to /Keyword Collection
-modify_relevance('ImmigrationUS', 'Adam', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')
+modify_relevance('ClimateChangeUK', 'Adam', '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection')

@@ -5,9 +5,9 @@ import shutil
 import tkinter as tk
 from tkinter import messagebox
 
-original_file = r'C:\Users\vshap\OneDrive\Desktop\work\code\Thesis\Thesis\Subreddit Data\US\HealthcareUS_data_0.1%.csv' # PLEASE CHANGE FILENAME IF NEEDED
-copy_file = r'C:\Users\vshap\OneDrive\Desktop\work\code\Thesis\Thesis\Annotation\US\Viktor\HealthcareLabelled.csv' # PLEASE CHANGE FILENAME IF NEEDED
-progress_file = 'progress.json'
+original_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Labelling data/ClimateChangeUK_data_0.1%.csv' # PLEASE CHANGE FILENAME IF NEEDED
+copy_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Adam/ClimateChangeUK_labelled_Adam.csv' # PLEASE CHANGE FILENAME IF NEEDED
+progress_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Adam/ClimateChangeUK_progress.json'
 
 if not os.path.exists(copy_file):
     shutil.copy(original_file, copy_file)

@@ -2,18 +2,19 @@ import pandas as pd
 import os
 from sklearn.metrics import cohen_kappa_score
 
-moderator1_file = 'Annotation/UK/Adam/IsraelPalestine_labelled.csv' # Change as needed
-moderator2_file = 'Annotation/UK/AnotherModerator/IsraelPalestine_labelled.csv' # Change as needed
+moderator1_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Kanushree/BrexitLabelled.csv' # Change as needed
+moderator2_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Adam/Brexit_labelled_Adam.csv' # Change as needed
 
 # Columns containing the labels
 label_columns = [
-    'pro_brexit', 'anti_brexit',
-    'pro_climateAction', 'anti_climateAction',
+    'pro_brexit','anti_brexit',
+    'pro_climateAction','anti_climateAction',
     'public_healthcare', 'private_healthcare',
     'pro_israel', 'pro_palestine',    
     'increase_tax', 'decrease_tax',  
     'neutral', 'irrelevant'  
 ]
+
 
 df_moderator1 = pd.read_csv(moderator1_file, dtype={'id': str})
 df_moderator2 = pd.read_csv(moderator2_file, dtype={'id': str})

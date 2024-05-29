@@ -23,13 +23,13 @@ def collect_data(subreddit, keyword, start_date):
                 'subreddit': subreddit,
                 'type': 'post',
                 'keyword': keyword,
-                'id': str(submission.id),
-                'author': str(submission.author) if submission.author else None,
+                'id': str(submission.id),  
+                'author': str(submission.author),
                 'title': submission.title,
                 'body': submission.selftext,
-                'created_utc': created_date.isoformat()
-            })
-
+                'created_utc': created_date.isoformat(),
+                'parent_id': ''  # No parent for posts
+        })
             submission.comments.replace_more(limit=0)
             for comment in submission.comments.list():
                 if not comment.author or not subreddit or not keyword:
@@ -39,11 +39,12 @@ def collect_data(subreddit, keyword, start_date):
                     'type': 'comment',
                     'keyword': keyword,
                     'id': str(comment.id),
-                    'author': str(comment.author) if comment.author else None,
+                    'author': str(comment.author),
                     'title': '',
                     'body': comment.body,
-                    'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat()
-                })
+                    'created_utc': datetime.fromtimestamp(comment.created_utc, tz=timezone.utc).isoformat(),
+                    'parent_id': str(comment.parent_id)  # Parent ID for comments
+            })
         return data
     except praw.exceptions.APIException as e:
         print(f"API Exception for {subreddit} with keyword {keyword}: {e}")
@@ -61,6 +62,7 @@ def verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date):
 
         existing_data = pd.read_csv(csv_path, dtype={'id': str}) if os.path.exists(csv_path) else pd.DataFrame()
         existing_combinations = set(zip(existing_data['subreddit'], existing_data['keyword']))
+        existing_ids = set(existing_data['id'])  # Set of existing IDs
 
         needed_combinations = {(subreddit, keyword) for subreddit in subreddits for keyword in keywords}
         missing_combinations = needed_combinations - existing_combinations
@@ -70,8 +72,11 @@ def verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date):
             data = collect_data(subreddit, keyword, start_date)
             if data:
                 df_new = pd.DataFrame(data)
-                df_new.to_csv(csv_path, mode='a', header=False, index=False)
-                print(f"Added missing data for {subreddit} - {keyword} to {csv_path}")
+                df_new = df_new[~df_new['id'].isin(existing_ids)]
+                if not df_new.empty:
+                    df_new.to_csv(csv_path, mode='a', header=False, index=False)
+                    print(f"Added missing data for {subreddit} - {keyword} to {csv_path}")
+                    existing_ids.update(df_new['id'].tolist())
 
 def main():
     start_year = 2010

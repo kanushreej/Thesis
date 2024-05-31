@@ -5,9 +5,9 @@ from datetime import datetime, timezone, timedelta
 import time
 
 reddit = praw.Reddit(
-    client_id='vInV29b0TXkkpagkYMoPLQ',
-    client_secret='VS-PBH-LXW_sXBbZWJvIKta5XeB6Yw',
-    user_agent='adam'
+    client_id='wEP3RUiICi5YvjDKhEKlkg',
+    client_secret='FP8O4SUc6ocAGNgCx5HB1-nczz6uQw',
+    user_agent='script:keyword_extractor:v1.0 (by u/Queasy-Parsnip-8103)'
 )
 
 def fetch_parent_id(comment_id):
@@ -20,7 +20,7 @@ def fetch_parent_id(comment_id):
         return ''
 
 def fetch_parent_data(parent_id, keyword):
-    """Fetch the parent data based on the parent ID."""
+    """Fetch the parent data based on the parent ID and assign the keyword."""
     try:
         parent = reddit.comment(id=parent_id) if parent_id.startswith('t1_') else reddit.submission(id=parent_id[3:])
         return {
@@ -85,6 +85,9 @@ def collect_data(subreddit, keyword, start_date):
 
 def update_parent_ids(df):
     """Ensure all comments have a parent ID and fetch parent data if missing."""
+    if 'parent_id' not in df.columns:
+        df['parent_id'] = ''
+
     parent_data = []
     missing_parent_ids = df[(df['type'] == 'comment') & (df['parent_id'] == '')]['id'].tolist()
     for comment_id in missing_parent_ids:

@@ -6,16 +6,17 @@ import tkinter as tk
 from tkinter import messagebox
 
 # File paths
-original_file = 'C:/Users/rapha/Documents/CS_VU/Thesis/Thesis/Annotation/US/Labelling data/ClimateChangeUS_data_0.1%.csv' # PLEASE CHANGE FILENAME IF NEEDED
-copy_file = 'C:/Users/rapha/Documents/CS_VU/Thesis/Thesis/Annotation/US/Raphael/ClimateChangeLabelled.csv' # PLEASE CHANGE FILENAME IF NEEDED
+original_data_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Labelling data/ClimateChangeUS_data.csv' 
+sample_data_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Labelling data/ClimateChangeUS400data_data.csv' 
+copy_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Zijing/new_ClimateChangeLabelled.csv' 
 progress_file = 'progress.json'
 
 # Copy file if not exists
 if not os.path.exists(copy_file):
-    shutil.copy(original_file, copy_file)
+    shutil.copy(sample_data_file, copy_file)
     print("File copied successfully.")
 
-# Load CSV into DataFrame
+# Load sample data into DataFrame
 df = pd.read_csv(copy_file)
 pd.set_option('display.max_colwidth', None)
 
@@ -52,120 +53,95 @@ def save_progress(last_index):
     with open(progress_file, 'w') as f:
         json.dump({"last_index": last_index}, f)
 
-# Tkinter application class
+# Load original data for parent posts
+original_df = pd.read_csv(original_data_file, dtype={'id': str, 'parent_id': str}, encoding='utf-8')
+parent_content_dict = original_df.set_index('id')['body'].to_dict()
+
 class LabelingApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Labeling Tool")
         self.root.geometry('1200x800')  # Set window size to 1200x800 pixels
-        self.root.configure(bg='#2d2d2d')  # Dark background color
+        self.root.configure(bg='gray')
         self.df = df
         self.new_columns = new_columns
         self.start_index = start_index
         self.current_index = self.start_index
+        self.parent_content_dict = parent_content_dict
 
         self.selected_labels = {col: None for col in self.new_columns}
-        self.parent_post_index = self.find_parent_post_index()
         self.create_widgets()
         self.display_current_data()
 
     def create_widgets(self):
-        self.main_frame = tk.Frame(self.root, bg='#2d2d2d')
-        self.main_frame.pack(fill=tk.BOTH, expand=True)
+        self.canvas = tk.Canvas(self.root, bg='gray')
+        self.scroll_y = tk.Scrollbar(self.root, orient="vertical", command=self.canvas.yview)
 
-        self.canvas = tk.Canvas(self.main_frame, bg='#2d2d2d')
-        self.scroll_y = tk.Scrollbar(self.main_frame, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scroll_y.set)
+        self.frame = tk.Frame(self.canvas, bg='gray')
+        self.canvas.create_window((0, 0), window=self.frame, anchor='nw')
+        self.frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
-        self.scroll_frame = tk.Frame(self.canvas, bg='#2d2d2d')
-        self.canvas.create_window((0, 0), window=self.scroll_frame, anchor='nw')
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        self.scroll_y.grid(row=0, column=1, sticky="ns")
 
-        self.scroll_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)
-
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
 
         self.labels = {}
+
         for i, column in enumerate(self.df.columns):
             if column not in self.new_columns:
-                label = tk.Label(self.scroll_frame, text=column, bg='#2d2d2d', fg='#ffffff', wraplength=1000, justify='left', anchor='w')
+                label = tk.Label(self.frame, text=column, bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
                 label.grid(row=i, column=0, columnspan=2, sticky="w")
                 self.labels[column] = label
 
-        self.parent_label_frame = tk.Frame(self.scroll_frame, bg='#1e1e1e')
-        self.parent_label_frame.grid(row=len(self.df.columns), column=0, columnspan=2, sticky="ew", pady=5)
-        self.parent_label = tk.Label(self.parent_label_frame, text="", bg='#1e1e1e', fg='#ffffff', wraplength=1000, justify='left', anchor='w', font=('Arial', 12, 'bold'))
-        self.parent_label.pack(fill='x', padx=5, pady=5)
+        # Add label for parent post
+        self.parent_label = tk.Label(self.frame, text="parent_post", bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
+        self.parent_label.grid(row=len(self.df.columns), column=0, columnspan=2, sticky="w")
 
-        self.comment_label_frame = tk.Frame(self.scroll_frame, bg='#2d2d2d')
-        self.comment_label_frame.grid(row=len(self.df.columns) + 1, column=0, columnspan=2, sticky="ew", pady=5)
-        self.comment_label = tk.Label(self.comment_label_frame, text="", bg='#2d2d2d', fg='#ffffff', wraplength=1000, justify='left', anchor='w', font=('Arial', 12))
-        self.comment_label.pack(fill='x', padx=5, pady=5)
-
-        self.buttons_frame = tk.Frame(self.main_frame, bg='#2d2d2d')
-        self.buttons_frame.pack(side=tk.RIGHT, fill=tk.Y)
+        self.buttons_frame = tk.Frame(self.frame, bg='gray')
+        self.buttons_frame.grid(row=0, column=2, rowspan=len(self.df.columns), sticky="ns")
 
         self.label_buttons = {}
         for i, column in enumerate(self.new_columns):
-            label_frame = tk.Frame(self.buttons_frame, bg='#2d2d2d')
+            label_frame = tk.Frame(self.buttons_frame, bg='gray')
             label_frame.grid(row=i, column=0, sticky="ew", pady=5)
 
-            label = tk.Label(label_frame, text=column, bg='#2d2d2d', fg='#ffffff', anchor='w')
+            label = tk.Label(label_frame, text=column, bg='gray', fg='white', anchor='w')
             label.pack(side=tk.LEFT)
 
-            relevant_button = tk.Button(label_frame, text="Yes", bg='#007acc', fg='#ffffff', command=lambda col=column: self.set_label(col, 1))
+            relevant_button = tk.Button(label_frame, text="Yes", command=lambda col=column: self.set_label(col, 1))
             relevant_button.pack(side=tk.LEFT, padx=5)
 
-            irrelevant_button = tk.Button(label_frame, text="No", bg='#d9534f', fg='#ffffff', command=lambda col=column: self.set_label(col, 0))
+            irrelevant_button = tk.Button(label_frame, text="No", command=lambda col=column: self.set_label(col, 0))
             irrelevant_button.pack(side=tk.LEFT, padx=5)
 
             self.label_buttons[column] = (relevant_button, irrelevant_button)
 
-        self.done_button = tk.Button(self.buttons_frame, text="Done", bg='#5cb85c', fg='#ffffff', command=self.mark_labels)
+        self.done_button = tk.Button(self.buttons_frame, text="Done", command=self.mark_labels)
         self.done_button.grid(row=len(self.new_columns), column=0, pady=20, sticky="ew")
 
-        self.prev_button = tk.Button(self.buttons_frame, text="← Previous", bg='#f0ad4e', fg='#ffffff', command=self.prev_data)
+        self.prev_button = tk.Button(self.buttons_frame, text="← Previous", command=self.prev_data)
         self.prev_button.grid(row=len(self.new_columns) + 1, column=0, pady=10, sticky="ew")
 
-        self.next_button = tk.Button(self.buttons_frame, text="Next →", bg='#5bc0de', fg='#ffffff', command=self.next_data)
+        self.next_button = tk.Button(self.buttons_frame, text="Next →", command=self.next_data)
         self.next_button.grid(row=len(self.new_columns) + 2, column=0, pady=10, sticky="ew")
 
-        self.counter_label = tk.Label(self.main_frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='#2d2d2d', fg='#ffffff')
-        self.counter_label.pack(side=tk.BOTTOM, pady=10)
-
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_rowconfigure(0, weight=1)
-        self.main_frame.grid_columnconfigure(0, weight=1)
-
-    def on_mouse_wheel(self, event):
-        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        self.counter_label = tk.Label(self.frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='gray', fg='white')
+        self.counter_label.grid(row=len(self.df.columns) + 1, column=0, columnspan=3, pady=10)
 
     def display_current_data(self):
         row = self.df.iloc[self.current_index]
-        if row['type'] == 'post':
-            self.parent_post_index = self.current_index
-
-        if self.parent_post_index is not None:
-            parent_post = self.df.iloc[self.parent_post_index]
-            parent_text = f"Parent Post - {parent_post['author']}: {parent_post['body']}"
-            self.parent_label.config(text=parent_text)
-        else:
-            self.parent_label.config(text="")
-
-        comment_text = f"Comment - {row['author']}: {row['body']}" if row['type'] == 'comment' else parent_text
-        self.comment_label.config(text=comment_text)
-
-        specific_columns = ['subreddit', 'keyword', 'id', 'author', 'created_utc']
-        for column in specific_columns:
-            value = row[column]
+        for column, value in row.items():
             if column in self.labels:
                 self.labels[column].config(text=f"{column}: {value}")
 
-        self.reset_label_buttons()
-        self.counter_label.config(text=f"Data Point: {self.current_index + 1}/{len(self.df)}")
-
+        parent_id = row['parent_id']
+        if pd.notna(parent_id) and parent_id[3:] in self.parent_content_dict:
+            parent_text = f"Parent Post: {self.parent_content_dict[parent_id[3:]]}"
+        else:
+            parent_text = "Parent Post: Not Available"
+        self.parent_label.config(text=parent_text)
 
         self.reset_label_buttons()
         self.counter_label.config(text=f"Data Point: {self.current_index + 1}/{len(self.df)}")
@@ -177,22 +153,22 @@ class LabelingApp:
             relevant_button, irrelevant_button = self.label_buttons[column]
             if value == 1:
                 relevant_button.config(relief=tk.SUNKEN, bg='light green')
-                irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+                irrelevant_button.config(relief=tk.RAISED, bg='light gray')
             elif value == 0:
-                relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+                relevant_button.config(relief=tk.RAISED, bg='light gray')
                 irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
             else:
-                relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
-                irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+                relevant_button.config(relief=tk.RAISED, bg='light gray')
+                irrelevant_button.config(relief=tk.RAISED, bg='light gray')
 
     def set_label(self, column, value):
         self.selected_labels[column] = value
         relevant_button, irrelevant_button = self.label_buttons[column]
         if value == 1:
             relevant_button.config(relief=tk.SUNKEN, bg='light green')
-            irrelevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+            irrelevant_button.config(relief=tk.RAISED, bg='light gray')
         else:
-            relevant_button.config(relief=tk.RAISED, bg='SystemButtonFace')
+            relevant_button.config(relief=tk.RAISED, bg='light gray')
             irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
 
     def mark_labels(self):
@@ -204,21 +180,11 @@ class LabelingApp:
 
     def prev_data(self):
         self.current_index = (self.current_index - 1) % len(self.df)
-        if self.df.iloc[self.current_index]['type'] == 'post':
-            self.parent_post_index = self.current_index
         self.display_current_data()
 
     def next_data(self):
         self.current_index = (self.current_index + 1) % len(self.df)
-        if self.df.iloc[self.current_index]['type'] == 'post':
-            self.parent_post_index = self.current_index
         self.display_current_data()
-
-    def find_parent_post_index(self):
-        for idx in range(self.current_index, -1, -1):
-            if self.df.iloc[idx]['type'] == 'post':
-                return idx
-        return None
 
     def quit(self):
         save_progress(self.current_index)

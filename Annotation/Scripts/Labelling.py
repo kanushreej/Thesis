@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 # File paths
-#original_data_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Labelling data/ClimateChangeUS_data.csv' 
+original_data_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Labelling data/ClimateChangeUS_data.csv' 
 sample_data_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Labelling data/ClimateChangeUS400data_data.csv' 
 copy_file = '/mnt/e/Clone/Thesis5313/Thesis/Annotation/US/Zijing/new_ClimateChangeLabelled.csv' 
 progress_file = 'progress.json'

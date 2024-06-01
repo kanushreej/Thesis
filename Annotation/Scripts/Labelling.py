@@ -11,34 +11,29 @@ sample_data_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/
 copy_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Brexit_labelled_trial.csv' 
 progress_file = 'progress.json'
 
-# Copy file if not exists
 if not os.path.exists(copy_file):
     shutil.copy(sample_data_file, copy_file)
     print("File copied successfully.")
 
-# Load sample data into DataFrame
 df = pd.read_csv(copy_file)
 pd.set_option('display.max_colwidth', None)
 
-# Define new columns
+# UK columns
 new_columns = [
-    'pro_climateAction', 'anti_climateAction',
+    'pro-brexit','anti-brexit','pro_climateAction', 'anti_climateAction',
     'public_healthcare', 'private_healthcare',
     'pro_israel', 'pro_palestine',
     'increase_tax', 'decrease_tax',
     'neutral', 'irrelevant'
 ]
 
-# Add new columns if not present
 for column in new_columns:
     if column not in df.columns:
         df[column] = float('nan')
 
-# Sorting data by subreddit and then keyword 
 df.sort_values(by=['subreddit', 'keyword', 'created_utc'], inplace=True)
 df.reset_index(drop=True, inplace=True)
 
-# Function to load progress
 def load_progress():
     if os.path.exists(progress_file):
         with open(progress_file, 'r') as f:
@@ -48,12 +43,10 @@ def load_progress():
 last_index = load_progress()
 start_index = last_index if last_index < len(df) else 0
 
-# Function to save progress
 def save_progress(last_index):
     with open(progress_file, 'w') as f:
         json.dump({"last_index": last_index}, f)
 
-# Load original data for parent posts
 original_df = pd.read_csv(original_data_file, dtype={'id': str, 'parent_id': str}, encoding='utf-8')
 parent_content_dict = original_df.set_index('id')['body'].to_dict()
 

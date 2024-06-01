@@ -8,7 +8,7 @@ from tkinter import messagebox
 # File paths
 original_data_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv' 
 sample_data_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Trials/Brexit_trial_sample.csv' 
-copy_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Brexit_labelled_trial.csv' 
+copy_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Adam/Brexit_labelled_trial.csv' 
 progress_file = 'progress.json'
 
 if not os.path.exists(copy_file):

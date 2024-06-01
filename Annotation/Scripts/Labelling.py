@@ -61,7 +61,7 @@ class LabelingApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Labeling Tool")
-        self.root.geometry('1200x800')  # Set window size to 1200x800 pixels
+        self.root.geometry('1500x900') 
         self.root.configure(bg='gray')
         self.df = df
         self.new_columns = new_columns
@@ -74,15 +74,20 @@ class LabelingApp:
         self.display_current_data()
 
     def create_widgets(self):
-        self.canvas = tk.Canvas(self.root, bg='gray')
-        self.scroll_y = tk.Scrollbar(self.root, orient="vertical", command=self.canvas.yview)
+        self.left_frame = tk.Frame(self.root, bg='gray')
+        self.left_frame.grid(row=0, column=0, sticky="nsew")
 
-        self.frame = tk.Frame(self.canvas, bg='gray')
-        self.canvas.create_window((0, 0), window=self.frame, anchor='nw')
-        self.frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.scroll_y = tk.Scrollbar(self.left_frame, orient="vertical")
+        self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.canvas.grid(row=0, column=0, sticky="nsew")
-        self.scroll_y.grid(row=0, column=1, sticky="ns")
+        self.text_canvas = tk.Canvas(self.left_frame, bg='gray', yscrollcommand=self.scroll_y.set)
+        self.text_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scroll_y.config(command=self.text_canvas.yview)
+
+        self.text_frame = tk.Frame(self.text_canvas, bg='gray')
+        self.text_canvas.create_window((0, 0), window=self.text_frame, anchor='nw')
+
+        self.text_frame.bind("<Configure>", lambda e: self.text_canvas.configure(scrollregion=self.text_canvas.bbox("all")))
 
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
@@ -91,21 +96,22 @@ class LabelingApp:
 
         for i, column in enumerate(self.df.columns):
             if column not in self.new_columns:
-                label = tk.Label(self.frame, text=column, bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
-                label.grid(row=i, column=0, columnspan=2, sticky="w")
+                label = tk.Label(self.text_frame, text=column, bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
+                label.grid(row=i, column=0, columnspan=2, sticky="w", pady=5)
                 self.labels[column] = label
 
         # Add label for parent post
-        self.parent_label = tk.Label(self.frame, text="parent_post", bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
-        self.parent_label.grid(row=len(self.df.columns), column=0, columnspan=2, sticky="w")
+        self.parent_label = tk.Label(self.text_frame, text="parent_post", bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
+        self.parent_label.grid(row=len(self.df.columns), column=0, columnspan=2, sticky="w", pady=5)
 
-        self.buttons_frame = tk.Frame(self.frame, bg='gray')
-        self.buttons_frame.grid(row=0, column=2, rowspan=len(self.df.columns), sticky="ns")
+        # Create a new frame for buttons and fix its position
+        self.buttons_frame = tk.Frame(self.root, bg='gray')
+        self.buttons_frame.grid(row=0, column=1, sticky="ns")
 
         self.label_buttons = {}
         for i, column in enumerate(self.new_columns):
             label_frame = tk.Frame(self.buttons_frame, bg='gray')
-            label_frame.grid(row=i, column=0, sticky="ew", pady=5)
+            label_frame.grid(row=i, column=0, sticky="ew", pady=10) 
 
             label = tk.Label(label_frame, text=column, bg='gray', fg='white', anchor='w')
             label.pack(side=tk.LEFT)
@@ -127,8 +133,10 @@ class LabelingApp:
         self.next_button = tk.Button(self.buttons_frame, text="Next →", command=self.next_data)
         self.next_button.grid(row=len(self.new_columns) + 2, column=0, pady=10, sticky="ew")
 
-        self.counter_label = tk.Label(self.frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='gray', fg='white')
+        self.counter_label = tk.Label(self.text_frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='gray', fg='white')
         self.counter_label.grid(row=len(self.df.columns) + 1, column=0, columnspan=3, pady=10)
+
+
 
     def display_current_data(self):
         row = self.df.iloc[self.current_index]

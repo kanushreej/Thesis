@@ -87,7 +87,7 @@ def main():
     'Conservatives', 'Climatechange', 'Healthcare', 'Progressive', 'USpolitics'
     ]
 
-    issues = ['ClimateChangeUS','HealthcareUS','IsraelPalestine','TaxationUS','ImmigrationUS']
+    issues = ['HealthcareUS','IsraelPalestine','TaxationUS','ImmigrationUS']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
     data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/US"
 

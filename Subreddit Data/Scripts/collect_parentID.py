@@ -90,14 +90,19 @@ def update_parent_ids(df):
 
     parent_data = []
     missing_parent_ids = df[(df['type'] == 'comment') & (df['parent_id'] == '')]['id'].tolist()
+    
+    # Fetch missing parent IDs
     for comment_id in missing_parent_ids:
         parent_id = fetch_parent_id(comment_id)
         df.loc[df['id'] == comment_id, 'parent_id'] = parent_id
 
+    # Ensure all parent_id values are strings
+    df['parent_id'] = df['parent_id'].astype(str)
+    
     # Fetch and add parent data if needed
     for index, row in df[df['type'] == 'comment'].iterrows():
         parent_id = row['parent_id']
-        if parent_id and df[df['id'] == parent_id[3:]].empty:
+        if parent_id and parent_id != 'nan' and df[df['id'] == parent_id[3:]].empty:
             parent_data_entry = fetch_parent_data(parent_id, row['keyword'])
             if parent_data_entry:
                 parent_data.append(parent_data_entry)
@@ -128,7 +133,7 @@ def verify_and_collect_data(subreddits, issues, base_dir, data_dir, start_date):
                     print(f"Added missing data for {subreddit} - {keyword} to {csv_path}")
                     existing_ids.update(df_new['id'].tolist())
 
-        # Update parent IDs for existing data and fetch parent data if needed
+        # Always update parent IDs for existing data and fetch parent data if needed
         if not existing_data.empty:
             existing_data, parent_data = update_parent_ids(existing_data)
             if parent_data:

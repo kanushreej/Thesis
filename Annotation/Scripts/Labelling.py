@@ -20,7 +20,7 @@ pd.set_option('display.max_colwidth', None)
 
 # UK columns
 new_columns = [
-    'pro-brexit','anti-brexit','pro_climateAction', 'anti_climateAction',
+    'pro_brexit','anti_brexit','pro_climateAction', 'anti_climateAction',
     'public_healthcare', 'private_healthcare',
     'pro_israel', 'pro_palestine',
     'increase_tax', 'decrease_tax',

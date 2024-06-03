@@ -1,199 +1,160 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import pandas as pd
 import json
 import os
-import pandas as pd
-import shutil
-import tkinter as tk
-from tkinter import messagebox
 
-# File paths
-original_data_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv' 
-sample_data_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Trials/Brexit_trial_sample.csv' 
-copy_file = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Annotation/UK/Adam/Brexit_labelled_trial.csv' 
-progress_file = 'progress.json'
+# Set paths and directories
+base_directory = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis"
+moderator_name = "Adam"
+issue = "Brexit"
+original_data_path = f"{base_directory}/Subreddit Data/UK/{issue}_data.csv"
+base_labeling_data_path = f"{base_directory}/Annotation/UK/Labelling data/{issue}_sample.csv"
+moderator_labeling_data_path = f"{base_directory}/Annotation/UK/{moderator_name}/{issue}_labelled.csv"
+progress_file = f"{base_directory}/Annotation/UK/{moderator_name}/Progress/{issue}.json"
 
-if not os.path.exists(copy_file):
-    shutil.copy(sample_data_file, copy_file)
-    print("File copied successfully.")
+os.makedirs(os.path.dirname(moderator_labeling_data_path), exist_ok=True)
+os.makedirs(os.path.dirname(progress_file), exist_ok=True)
 
-df = pd.read_csv(copy_file)
-pd.set_option('display.max_colwidth', None)
+# Load Data
+def load_data(filepath, basepath):
+    if not os.path.exists(filepath):
+        df = pd.read_csv(basepath)
+        df.to_csv(filepath, index=False)
+    df = pd.read_csv(filepath, dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
+    df['parent_id'] = df['parent_id'].fillna('')
+    df['body'] = df['body'].fillna('')
+    df['title'] = df['title'].fillna('')
+    return df
 
-# UK columns
-new_columns = [
-    'pro_brexit','anti_brexit','pro_climateAction', 'anti_climateAction',
-    'public_healthcare', 'private_healthcare',
-    'pro_israel', 'pro_palestine',
-    'increase_tax', 'decrease_tax',
-    'neutral', 'irrelevant'
-]
-
-for column in new_columns:
-    if column not in df.columns:
-        df[column] = float('nan')
-
-df.sort_values(by=['subreddit', 'keyword', 'created_utc'], inplace=True)
-df.reset_index(drop=True, inplace=True)
-
+# Load and Save Progress
 def load_progress():
     if os.path.exists(progress_file):
         with open(progress_file, 'r') as f:
-            return json.load(f)["last_index"]
+            return json.load(f).get("last_index", 0)
     return 0
-
-last_index = load_progress()
-start_index = last_index if last_index < len(df) else 0
 
 def save_progress(last_index):
     with open(progress_file, 'w') as f:
         json.dump({"last_index": last_index}, f)
 
-original_df = pd.read_csv(original_data_file, dtype={'id': str, 'parent_id': str}, encoding='utf-8')
-parent_content_dict = original_df.set_index('id')['body'].to_dict()
-
+# GUI Application
 class LabelingApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Data Labeling Tool")
-        self.root.geometry('1500x900') 
-        self.root.configure(bg='gray')
-        self.df = df
-        self.new_columns = new_columns
-        self.start_index = start_index
-        self.current_index = self.start_index
-        self.parent_content_dict = parent_content_dict
+    def __init__(self, master):
+        self.master = master
+        master.title("Reddit Comment Labeling")
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        self.selected_labels = {col: None for col in self.new_columns}
-        self.create_widgets()
-        self.display_current_data()
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TButton', background='#0078D7', foreground='white', padding=5)
+        style.map('TButton', background=[('active', '#0063B1'), ('disabled', '#f2f2f2')])
 
-    def create_widgets(self):
-        self.left_frame = tk.Frame(self.root, bg='gray')
-        self.left_frame.grid(row=0, column=0, sticky="nsew")
+        self.label_data = load_data(moderator_labeling_data_path, base_labeling_data_path)
+        self.original_data = load_data(original_data_path, None)
+        self.current_index = load_progress()
 
-        self.scroll_y = tk.Scrollbar(self.left_frame, orient="vertical")
-        self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        self.setup_gui()
+        self.display_data()
 
-        self.text_canvas = tk.Canvas(self.left_frame, bg='gray', yscrollcommand=self.scroll_y.set)
-        self.text_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.scroll_y.config(command=self.text_canvas.yview)
+    def setup_gui(self):
+        self.index_label = ttk.Label(self.master, text=f"Index: {self.current_index + 1}/{len(self.label_data)}", font=('Helvetica', 12))
+        self.index_label.pack(fill=tk.X, padx=10, pady=5)
 
-        self.text_frame = tk.Frame(self.text_canvas, bg='gray')
-        self.text_canvas.create_window((0, 0), window=self.text_frame, anchor='nw')
+        self.nav_frame = ttk.Frame(self.master)
+        self.nav_frame.pack(fill=tk.X, expand=True, pady=10)
 
-        self.text_frame.bind("<Configure>", lambda e: self.text_canvas.configure(scrollregion=self.text_canvas.bbox("all")))
+        self.prev_button = ttk.Button(self.nav_frame, text="Previous", command=self.previous_data)
+        self.prev_button.pack(side=tk.LEFT)
 
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
+        self.next_button = ttk.Button(self.nav_frame, text="Next", command=self.next_data)
+        self.next_button.pack(side=tk.RIGHT)
 
-        self.labels = {}
+        self.save_button = ttk.Button(self.nav_frame, text="Save", command=self.save_data)
+        self.save_button.pack(side=tk.RIGHT, padx=10)
 
-        for i, column in enumerate(self.df.columns):
-            if column not in self.new_columns:
-                label = tk.Label(self.text_frame, text=column, bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
-                label.grid(row=i, column=0, columnspan=2, sticky="w", pady=5)
-                self.labels[column] = label
+        self.setup_text_and_checkbuttons()
 
-        # Add label for parent post
-        self.parent_label = tk.Label(self.text_frame, text="parent_post", bg='gray', fg='white', wraplength=1000, justify='left', anchor='w')
-        self.parent_label.grid(row=len(self.df.columns), column=0, columnspan=2, sticky="w", pady=5)
+    def setup_text_and_checkbuttons(self):
+        self.text_frame = tk.Frame(self.master)
+        self.text_frame.pack(fill=tk.BOTH, expand=True)
+        self.text_display = tk.Text(self.text_frame, height=10, width=80)
+        self.text_scroll = tk.Scrollbar(self.text_frame, command=self.text_display.yview)
+        self.text_display.configure(yscrollcommand=self.text_scroll.set)
+        self.text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.text_display.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Create a new frame for buttons and fix its position
-        self.buttons_frame = tk.Frame(self.root, bg='gray')
-        self.buttons_frame.grid(row=0, column=1, sticky="ns")
+        self.checkbuttons_frame = ttk.Frame(self.master)
+        self.checkbuttons_frame.pack(fill=tk.X, expand=True, pady=10)
+        self.check_vars = {}
+        labels = [
+            'pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
+            'public_healthcare', 'private_healthcare', 'pro_israel', 'pro_palestine',
+            'increase_tax', 'decrease_tax', 'neutral', 'irrelevant'
+        ]
+        for label in labels:
+            var = tk.IntVar(value=0)
+            chk = ttk.Checkbutton(self.checkbuttons_frame, text=label, variable=var)
+            chk.pack(anchor=tk.W)
+            self.check_vars[label] = var
 
-        self.label_buttons = {}
-        for i, column in enumerate(self.new_columns):
-            label_frame = tk.Frame(self.buttons_frame, bg='gray')
-            label_frame.grid(row=i, column=0, sticky="ew", pady=10) 
+    def display_data(self):
+        self.index_label.configure(text=f"Index: {self.current_index + 1}/{len(self.label_data)}")
+        if not len(self.label_data):
+            messagebox.showerror("Error", "No data to display.")
+            self.master.quit()
+            return
 
-            label = tk.Label(label_frame, text=column, bg='gray', fg='white', anchor='w')
-            label.pack(side=tk.LEFT)
+        current_data = self.label_data.iloc[self.current_index]
+        title_text = f"Title: {current_data['title'] if current_data['title'] else 'Empty'}"
+        body_text = f"Body: {current_data['body'] if current_data['body'] else 'Empty'}"
+        thread = self.build_thread(current_data['parent_id'])
 
-            relevant_button = tk.Button(label_frame, text="Yes", command=lambda col=column: self.set_label(col, 1))
-            relevant_button.pack(side=tk.LEFT, padx=5)
+        self.text_display.delete(1.0, tk.END)
+        if thread.strip():
+            self.text_display.insert(tk.END, thread + "\n")
+            self.text_display.insert(tk.END, "----------------------------------------\n")
+        self.text_display.insert(tk.END, title_text + "\n" + body_text + "\n")
 
-            irrelevant_button = tk.Button(label_frame, text="No", command=lambda col=column: self.set_label(col, 0))
-            irrelevant_button.pack(side=tk.LEFT, padx=5)
+        if thread.strip():
+            self.text_display.tag_add("highlight", f"{int(self.text_display.index('end').split('.')[0]) - 2}.0", "end")
+            self.text_display.tag_config("highlight", background="red", foreground="white")
 
-            self.label_buttons[column] = (relevant_button, irrelevant_button)
-
-        self.done_button = tk.Button(self.buttons_frame, text="Done", command=self.mark_labels)
-        self.done_button.grid(row=len(self.new_columns), column=0, pady=20, sticky="ew")
-
-        self.prev_button = tk.Button(self.buttons_frame, text="← Previous", command=self.prev_data)
-        self.prev_button.grid(row=len(self.new_columns) + 1, column=0, pady=10, sticky="ew")
-
-        self.next_button = tk.Button(self.buttons_frame, text="Next →", command=self.next_data)
-        self.next_button.grid(row=len(self.new_columns) + 2, column=0, pady=10, sticky="ew")
-
-        self.counter_label = tk.Label(self.text_frame, text=f"Data Point: {self.current_index + 1}/{len(self.df)}", bg='gray', fg='white')
-        self.counter_label.grid(row=len(self.df.columns) + 1, column=0, columnspan=3, pady=10)
-
-
-
-    def display_current_data(self):
-        row = self.df.iloc[self.current_index]
-        for column, value in row.items():
-            if column in self.labels:
-                self.labels[column].config(text=f"{column}: {value}")
-
-        parent_id = row['parent_id']
-        if pd.notna(parent_id) and parent_id[3:] in self.parent_content_dict:
-            parent_text = f"Parent Post: {self.parent_content_dict[parent_id[3:]]}"
-        else:
-            parent_text = "Parent Post: Not Available"
-        self.parent_label.config(text=parent_text)
-
-        self.reset_label_buttons()
-        self.counter_label.config(text=f"Data Point: {self.current_index + 1}/{len(self.df)}")
-
-    def reset_label_buttons(self):
-        for column in self.new_columns:
-            value = self.df.at[self.current_index, column]
-            self.selected_labels[column] = value
-            relevant_button, irrelevant_button = self.label_buttons[column]
-            if value == 1:
-                relevant_button.config(relief=tk.SUNKEN, bg='light green')
-                irrelevant_button.config(relief=tk.RAISED, bg='light gray')
-            elif value == 0:
-                relevant_button.config(relief=tk.RAISED, bg='light gray')
-                irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
-            else:
-                relevant_button.config(relief=tk.RAISED, bg='light gray')
-                irrelevant_button.config(relief=tk.RAISED, bg='light gray')
-
-    def set_label(self, column, value):
-        self.selected_labels[column] = value
-        relevant_button, irrelevant_button = self.label_buttons[column]
-        if value == 1:
-            relevant_button.config(relief=tk.SUNKEN, bg='light green')
-            irrelevant_button.config(relief=tk.RAISED, bg='light gray')
-        else:
-            relevant_button.config(relief=tk.RAISED, bg='light gray')
-            irrelevant_button.config(relief=tk.SUNKEN, bg='light green')
-
-    def mark_labels(self):
-        for column, value in self.selected_labels.items():
-            if value is not None:
-                self.df.at[self.current_index, column] = value
-        self.df.to_csv(copy_file, index=False)
-        self.next_data()
-
-    def prev_data(self):
-        self.current_index = (self.current_index - 1) % len(self.df)
-        self.display_current_data()
+    def build_thread(self, parent_id):
+        thread = ""
+        while parent_id and parent_id.startswith('t3_'):
+            parent = self.original_data[self.original_data['id'] == parent_id[3:]].iloc[0]
+            thread = parent['body'] + "\n\n" + thread
+            parent_id = parent.get('parent_id', None)
+        return thread
 
     def next_data(self):
-        self.current_index = (self.current_index + 1) % len(self.df)
-        self.display_current_data()
+        if self.current_index < len(self.label_data) - 1:
+            self.current_index += 1
+            save_progress(self.current_index)
+            self.display_data()
 
-    def quit(self):
-        save_progress(self.current_index)
-        messagebox.showinfo("Progress Saved", "Progress saved successfully!")
-        self.root.destroy()
+    def previous_data(self):
+        if self.current_index > 0:
+            self.current_index -= 1
+            save_progress(self.current_index)
+            self.display_data()
 
-if __name__ == "__main__":
+    def on_closing(self):
+        save_progress(self.current_index)  # Save position without prompting
+        self.master.destroy()
+
+    def save_data(self):
+        for label, var in self.check_vars.items():
+            self.label_data.at[self.current_index, label] = var.get()
+        self.label_data.to_csv(moderator_labeling_data_path, index=False)
+        messagebox.showinfo("Save", "Data has been saved successfully.")
+
+# Main function
+def main():
     root = tk.Tk()
     app = LabelingApp(root)
-    root.protocol("WM_DELETE_WINDOW", app.quit)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()

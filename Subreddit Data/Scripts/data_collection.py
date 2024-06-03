@@ -1,7 +1,7 @@
 import praw
 import os
 import pandas as pd
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import time
 
 reddit = praw.Reddit(
@@ -52,7 +52,7 @@ def main():
                   'england', 'europe', 'uknews', 'LabourUK', 'Labour', 'tories', 'nhs', 
                   'brexit', 'europeanunion']
 
-    issues = ['Brexit','ClimateChangeUK','HealthcareUK','IsraelPalestine','TaxationUK']
+    issues = ['Brexit','ClimateChangeUK','HealthcareUK','TaxationUK']
     base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
     data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
 

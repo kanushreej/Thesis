@@ -6,13 +6,13 @@ import os
 import numpy as np
 
 # Set paths and directories
-base_directory = "/Users/kanushreejaiswal/Desktop/Thesis"
-moderator_name = "Kanu"
-issue = "IsraelPalestineUK"
-original_data_path = f"{base_directory}/Subreddit Data/UK/{issue}_data.csv"
-base_labeling_data_path = f"{base_directory}/Annotation/UK/Labelling data/{issue}_sample.csv"
-moderator_labeling_data_path = f"{base_directory}/Annotation/UK/{moderator_name}/{issue}_labelled.csv"
-progress_file = f"{base_directory}/Annotation/UK/{moderator_name}/Progress/{issue}.json"
+base_directory = "/Users/kanushreejaiswal/Desktop"
+moderator_name = "Kanushree"
+issue = "Brexit"
+original_data_path = f"{base_directory}/cleaned data/UK/{issue}_data.csv"
+base_labeling_data_path = f"{base_directory}/Thesis/Annotation/UK/Labelling data/{issue}_sample.csv"
+moderator_labeling_data_path = f"{base_directory}/Thesis/Annotation/UK/{moderator_name}/{issue}_labelled.csv"
+progress_file = f"{base_directory}/Thesis/Annotation/UK/{moderator_name}/Progress/{issue}.json"
 
 os.makedirs(os.path.dirname(moderator_labeling_data_path), exist_ok=True)
 os.makedirs(os.path.dirname(progress_file), exist_ok=True)

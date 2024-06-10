@@ -19,7 +19,7 @@ def process_files(file1_path, file2_path):
 
 # Paths to the CSV files
 base_directory = "/Users/kanushreejaiswal/Desktop" # Change this
-issue = 'IsraelPalestineUK' # Change this
+issue = 'HealthcareUK' # Change this
 moderator_name1 = "Kanushree" # Change this
 moderator_name2 = "Adam" # Change this
 

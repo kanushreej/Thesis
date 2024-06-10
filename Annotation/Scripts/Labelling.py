@@ -6,10 +6,10 @@ import os
 import numpy as np
 
 # Set paths and directories
-base_directory = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis"
-moderator_name = "Adam"
+base_directory = "/Users/kanushreejaiswal/Desktop/Thesis"
+moderator_name = "Kanushree"
 issue = "IsraelPalestineUK"
-original_data_path = f"{base_directory}/Subreddit data/UK/{issue}_data.csv"
+original_data_path = f"{base_directory}/cleaned data/UK/{issue}_data.csv"
 base_labeling_data_path = f"{base_directory}/Annotation/UK/Labelling data/{issue}_sample.csv"
 moderator_labeling_data_path = f"{base_directory}/Annotation/UK/{moderator_name}/{issue}_labelled.csv"
 progress_file = f"{base_directory}/Annotation/UK/{moderator_name}/Progress/{issue}.json"

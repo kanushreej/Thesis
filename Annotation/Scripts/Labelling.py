@@ -8,7 +8,7 @@ import numpy as np
 # Set paths and directories
 base_directory = "C:/Users/rapha/Documents/CS_VU/Thesis"
 moderator_name = "Raphael"
-issue = "TaxationUK"
+issue = "Brexit"
 team = "UK"
 original_data_path = f"{base_directory}/Thesis/Subreddit Data/{team}/{issue}_data.csv"
 base_labeling_data_path = f"{base_directory}/Thesis/Annotation/{team}/Labelling data/{issue}_sample.csv"

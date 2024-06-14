@@ -6,13 +6,15 @@ import os
 import numpy as np
 
 # Set paths and directories
-base_directory = "/Users/kanushreejaiswal/Desktop/Thesis"
-moderator_name = "Kanushree"
-issue = "IsraelPalestineUK"
-original_data_path = f"{base_directory}/cleaned data/UK/{issue}_data.csv"
-base_labeling_data_path = f"{base_directory}/Annotation/UK/Labelling data/{issue}_sample.csv"
-moderator_labeling_data_path = f"{base_directory}/Annotation/UK/{moderator_name}/{issue}_labelled.csv"
-progress_file = f"{base_directory}/Annotation/UK/{moderator_name}/Progress/{issue}.json"
+base_directory = "C:/Users/rapha/Documents/CS_VU/Thesis"
+moderator_name = "Raphael"
+issue = "TaxationUK"
+team = "UK"
+original_data_path = f"{base_directory}/Thesis/Subreddit Data/{team}/{issue}_data.csv"
+base_labeling_data_path = f"{base_directory}/Thesis/Annotation/{team}/Labelling data/{issue}_sample.csv"
+moderator_labeling_data_path = f"{base_directory}/Thesis/Annotation/{team}/{moderator_name}/{issue}_labelled.csv"
+progress_file = f"{base_directory}/Thesis/Annotation/{team}/{moderator_name}/Progress/{issue}.json"
+keywords_file_path = f"{base_directory}/Thesis/Keyword Selection/Final/{issue}_final_keywords.csv"
 
 os.makedirs(os.path.dirname(moderator_labeling_data_path), exist_ok=True)
 os.makedirs(os.path.dirname(progress_file), exist_ok=True)
@@ -27,6 +29,12 @@ def load_data(filepath, basepath):
     df['body'] = df['body'].fillna('')
     df['title'] = df['title'].fillna('')
     return df
+
+# Load Keywords
+def load_keywords(filepath):
+    if os.path.exists(filepath):
+        return pd.read_csv(filepath, header=None).iloc[:, 0].tolist()
+    return []
 
 # Load and Save Progress
 def load_progress():
@@ -46,21 +54,41 @@ class LabelingApp:
         master.title("Reddit Comment Labeling")
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('TButton', background='#0078D7', foreground='white', padding=5)
-        style.map('TButton', background=[('active', '#0063B1'), ('disabled', '#f2f2f2')])
+        self.apply_theme()
 
         self.label_data = load_data(moderator_labeling_data_path, base_labeling_data_path)
         self.original_data = load_data(original_data_path, None)
+        self.keywords = load_keywords(keywords_file_path)
         self.current_index = load_progress()
 
         self.setup_gui()
         self.display_data()
 
+    def apply_theme(self):
+        style = ttk.Style()
+        style.theme_use('clam')
+
+        dark_bg = '#2E2E2E'
+        light_bg = '#3C3F41'
+        accent_bg = '#4B6EAF'
+        accent_fg = '#FFFFFF'
+        text_fg = '#E0E0E0'
+        hover_bg = '#3A5F91'
+
+        style.configure('.', background=dark_bg, foreground=text_fg, font=('Helvetica', 10))
+        style.configure('TLabel', background=dark_bg, foreground=text_fg)
+        style.configure('TButton', background=accent_bg, foreground=accent_fg, padding=10, font=('Helvetica', 10, 'bold'))
+        style.map('TButton', background=[('active', hover_bg), ('disabled', '#5A5A5A')])
+        style.configure('TCheckbutton', background=dark_bg, foreground=text_fg, font=('Helvetica', 10))
+
+        self.master.configure(background=dark_bg)
+
     def setup_gui(self):
-        self.index_label = ttk.Label(self.master, text=f"Index: {self.current_index + 1}/{len(self.label_data)}", font=('Helvetica', 12))
+        self.index_label = ttk.Label(self.master, text=f"Index: {self.current_index + 1}/{len(self.label_data)}", font=('Helvetica', 12, 'bold'))
         self.index_label.pack(fill=tk.X, padx=10, pady=5)
+
+        self.message_label = ttk.Label(self.master, text="", font=('Helvetica', 10), foreground='green')
+        self.message_label.pack(fill=tk.X, padx=10, pady=5)
 
         self.nav_frame = ttk.Frame(self.master)
         self.nav_frame.pack(fill=tk.X, expand=True, pady=10)
@@ -77,9 +105,9 @@ class LabelingApp:
         self.setup_text_and_checkbuttons()
 
     def setup_text_and_checkbuttons(self):
-        self.text_frame = tk.Frame(self.master)
+        self.text_frame = tk.Frame(self.master, bg='#2E2E2E')
         self.text_frame.pack(fill=tk.BOTH, expand=True)
-        self.text_display = tk.Text(self.text_frame, height=10, width=80)
+        self.text_display = tk.Text(self.text_frame, height=10, width=80, bg='#1E1E1E', fg='#FFFFFF', insertbackground='#FFFFFF', wrap='word', font=('Helvetica', 10))
         self.text_scroll = tk.Scrollbar(self.text_frame, command=self.text_display.yview)
         self.text_display.configure(yscrollcommand=self.text_scroll.set)
         self.text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -96,7 +124,7 @@ class LabelingApp:
         for label in labels:
             var = tk.IntVar(value=0)
             chk = ttk.Checkbutton(self.checkbuttons_frame, text=label, variable=var)
-            chk.pack(anchor=tk.W)
+            chk.pack(anchor=tk.W, pady=5)
             self.check_vars[label] = var
 
     def display_data(self):
@@ -117,9 +145,7 @@ class LabelingApp:
             self.text_display.insert(tk.END, "----------------------------------------\n")
         self.text_display.insert(tk.END, title_text + "\n" + body_text + "\n")
 
-        if thread.strip():
-            self.text_display.tag_add("highlight", f"{int(self.text_display.index('end').split('.')[0]) - 2}.0", "end")
-            self.text_display.tag_config("highlight", background="red", foreground="white")
+        self.highlight_keywords()
 
         # Update checkbutton states
         self.update_checkbuttons()
@@ -146,9 +172,22 @@ class LabelingApp:
                 break
         return thread
 
+    def highlight_keywords(self):
+        text = self.text_display.get(1.0, tk.END)
+        for keyword in self.keywords:
+            idx = 1.0
+            while True:
+                idx = self.text_display.search(keyword, idx, nocase=1, stopindex=tk.END)
+                if not idx:
+                    break
+                end_idx = f"{idx}+{len(keyword)}c"
+                self.text_display.tag_add(keyword, idx, end_idx)
+                self.text_display.tag_config(keyword, background="yellow", foreground="black")
+                idx = end_idx
+
     def next_data(self):
         if self.current_index < len(self.label_data) - 1:
-            self.save_data()  # Save the current options
+            self.save_data(display_message=True)  # Save the current options
             self.reset_checkbuttons()  # Reset checkbuttons before moving to the next data
             self.current_index += 1
             save_progress(self.current_index)
@@ -175,15 +214,20 @@ class LabelingApp:
             var.set(0)
 
     def on_closing(self):
-        self.save_data()
+        self.save_data(display_message=False)
         save_progress(self.current_index)  # Save position without prompting
         self.master.destroy()
 
-    def save_data(self):
+    def save_data(self, display_message=False):
         for label, var in self.check_vars.items():
             self.label_data.at[self.current_index, label] = var.get()
         self.label_data.to_csv(moderator_labeling_data_path, index=False)
-        messagebox.showinfo("Save", "Data has been saved successfully.")
+        if display_message:
+            self.show_temp_message("Data has been saved successfully.")
+
+    def show_temp_message(self, message):
+        self.message_label.config(text=message)
+        self.master.after(2000, lambda: self.message_label.config(text=""))  # Clear message after 2 seconds
 
 # Main function
 def main():

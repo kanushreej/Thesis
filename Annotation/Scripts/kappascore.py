@@ -5,9 +5,9 @@ import numpy as np
 base_directory = "/Users/kanushreejaiswal/Desktop" #Change this
 issue = 'IsraelPalestineUK' #Change this
 moderator_name1 = "Kanushree" #Change this
-moderator_name2 = "Adam" #Change this
+moderator_name2 = "Raphael" #Change this
 
-columns_for_aggregate = ['pro_israel', 'pro_palestine', 'neutral', 'irrelevant'] #Change this
+columns_for_aggregate = ['pro_israel', 'pro_palestine','neutral', 'irrelevant'] #Change this
 
 start_row = 0 # Change this
 end_row = 30 #Change this

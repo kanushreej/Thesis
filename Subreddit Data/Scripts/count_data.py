@@ -24,8 +24,8 @@ def count_posts_comments(issue, data_dir):
     return total_posts, total_comments
 
 # Update issue and local directory up to /Keyword Collection
-issue = 'Brexit'  
-data_dir = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK'
+issue = 'IsraelPalestineUK'  
+data_dir = '/Users/kanushreejaiswal/Desktop/Thesis/Subreddit Data/UK'
 
 total_posts, total_comments = count_posts_comments(issue, data_dir)
 print(f"Total number of posts: {total_posts}")

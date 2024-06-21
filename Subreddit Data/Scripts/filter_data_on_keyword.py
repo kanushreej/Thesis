@@ -18,9 +18,9 @@ def remove_old_keywords_data(issue, base_dir, data_dir):
         print(f"No data found for issue '{issue}' at {csv_path}")
 
 def main():
-    base_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Keyword Selection/Final"
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/US"
-    issues = ['ImmigrationUS']
+    base_dir = "/Users/kanushreejaiswal/Desktop/Thesis/Keyword Selection/Final"
+    data_dir = "/Users/kanushreejaiswal/Desktop/Thesis/Subreddit Data/UK"
+    issues = ['TaxationUK']
 
     for issue in issues:
         remove_old_keywords_data(issue, base_dir, data_dir)

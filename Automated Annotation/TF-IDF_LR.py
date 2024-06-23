@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import KFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -7,17 +7,14 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 import numpy as np
 
 # Load Data
-labelled_data = pd.read_csv('labelled_data.csv')
-unlabelled_data = pd.read_csv('unlabelled_data.csv')
+labelled_data = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/Brexit_labelled.csv', dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
+unlabelled_data = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv', dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
 
 # Combine title and body
 def combine_title_body(row):
-    if pd.isna(row['title']):
-        return row['body']
-    elif pd.isna(row['body']):
-        return row['title']
-    else:
-        return row['title'] + ' ' + row['body']
+    title = row['title'] if not pd.isna(row['title']) else ''
+    body = row['body'] if not pd.isna(row['body']) else ''
+    return f"{title} {body}".strip()
 
 labelled_data['text'] = labelled_data.apply(combine_title_body, axis=1)
 unlabelled_data['text'] = unlabelled_data.apply(combine_title_body, axis=1)
@@ -29,15 +26,27 @@ unlabelled_data = unlabelled_data[unlabelled_data['text'].str.strip().astype(boo
 # Context Handling
 def build_thread(data, comment_id):
     thread = ""
-    parent_id = data.loc[data['id'] == comment_id, 'parent_id'].values[0]
+    try:
+        parent_id = data.loc[data['id'] == comment_id, 'parent_id'].values[0]
+    except IndexError:
+        return thread
+
     while parent_id:
         if parent_id.startswith('t1_'):
-            parent_comment = data[data['id'] == parent_id[3:]].iloc[0]
-            thread = f"{parent_comment['body']}\n\n" + thread
-            parent_id = parent_comment['parent_id']
+            parent_comment = data[data['id'] == parent_id[3:]]
+            if not parent_comment.empty:
+                parent_comment = parent_comment.iloc[0]
+                thread = f"{parent_comment['body']}\n\n" + thread
+                parent_id = parent_comment['parent_id']
+            else:
+                break
         elif parent_id.startswith('t3_'):
-            parent_post = data[data['id'] == parent_id[3:]].iloc[0]
-            thread = f"{parent_post['title']}\n\n{parent_post['body']}\n\n" + thread
+            parent_post = data[data['id'] == parent_id[3:]]
+            if not parent_post.empty:
+                parent_post = parent_post.iloc[0]
+                thread = f"{parent_post['title']}\n\n{parent_post['body']}\n\n" + thread
+            break
+        else:
             break
     return thread
 
@@ -59,43 +68,38 @@ stances = ['pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction
            'public_healthcare', 'private_healthcare', 'pro_israel', 'pro_palestine',
            'increase_tax', 'decrease_tax', 'neutral', 'irrelevant']
 
-# Perform 10-fold cross-validation for each stance
-results = {}
+# Perform 10-fold cross-validation for all stances simultaneously
+results = {stance: {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': []} for stance in stances}
 
-for stance in stances:
-    labels = labelled_data[stance].values
-    kf = KFold(n_splits=10, shuffle=True, random_state=42)
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
+for train_index, test_index in kf.split(tfidf_matrix_labelled):
+    train_vectors, test_vectors = tfidf_matrix_labelled[train_index], tfidf_matrix_labelled[test_index]
     
-    accuracy_scores = []
-    precision_scores = []
-    recall_scores = []
-    f1_scores = []
-
-    for train_index, test_index in kf.split(tfidf_matrix_labelled):
-        train_vectors, test_vectors = tfidf_matrix_labelled[train_index], tfidf_matrix_labelled[test_index]
-        train_labels, test_labels = labels[train_index], labels[test_index]
-
-        # You can use Logistic Regression or SVM
+    for stance in stances:
+        train_labels = labelled_data[stance].values[train_index]
+        test_labels = labelled_data[stance].values[test_index]
+        
         clf = LogisticRegression()
         # clf = SVC(probability=True)
-
+        
         clf.fit(train_vectors, train_labels)
         predictions = clf.predict(test_vectors)
-        probabilities = clf.predict_proba(test_vectors)[:, 1]
-
+        
         acc = accuracy_score(test_labels, predictions)
         precision, recall, f1, _ = precision_recall_fscore_support(test_labels, predictions, average='binary')
+        
+        results[stance]['accuracy'].append(acc)
+        results[stance]['precision'].append(precision)
+        results[stance]['recall'].append(recall)
+        results[stance]['f1_score'].append(f1)
 
-        accuracy_scores.append(acc)
-        precision_scores.append(precision)
-        recall_scores.append(recall)
-        f1_scores.append(f1)
-
+# Average the results
+for stance in stances:
     results[stance] = {
-        'accuracy': np.mean(accuracy_scores),
-        'precision': np.mean(precision_scores),
-        'recall': np.mean(recall_scores),
-        'f1_score': np.mean(f1_scores)
+        'accuracy': np.mean(results[stance]['accuracy']),
+        'precision': np.mean(results[stance]['precision']),
+        'recall': np.mean(results[stance]['recall']),
+        'f1_score': np.mean(results[stance]['f1_score'])
     }
 
 # Post-processing to handle logical contradictions
@@ -137,7 +141,7 @@ def predict_on_unlabelled_data():
         clf = LogisticRegression()
         # clf = SVC(probability=True)
 
-        clf.fit(tfidf_matrix_unlabelled, np.zeros(len(tfidf_matrix_unlabelled)))  # Dummy fitting
+        clf.fit(tfidf_matrix_labelled, labelled_data[stance])  # Use the labelled data for fitting
         stance_predictions = clf.predict_proba(tfidf_matrix_unlabelled)[:, 1]
         predictions.append(stance_predictions)
 

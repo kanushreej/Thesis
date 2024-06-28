@@ -69,8 +69,13 @@ for column, info in majority_minority_info.items():
 # Convert the dictionary of resampled columns back to a dataframe
 resampled_df = pd.DataFrame(resampled_columns)
 
-# Save the resampled data to a CSV file
-resampled_df.to_csv('/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/Resampled_Brexit_labelled.csv', index=False)
+# Replace the relevant columns in the original dataframe with the resampled data
+for column in resampled_columns.keys():
+    df[column] = resampled_df[column]
+
+# Save the modified dataframe to a new CSV file
+output_file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/Brexit_ROSbalanced.csv'
+df.to_csv(output_file_path, index=False)
 
 # Verify the resampling results
 resampled_counts = resampled_df.apply(pd.Series.value_counts).fillna(0).astype(int)

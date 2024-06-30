@@ -1,14 +1,16 @@
 import pandas as pd
-from sklearn.model_selection import KFold
+import os
+from sklearn.model_selection import StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 import numpy as np
+from joblib import Parallel, delayed
 
-# Load Data
-labelled_data = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/Brexit_labelled.csv', dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
-unlabelled_data = pd.read_csv('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv', dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
+# Function to load data
+def load_data(file_path):
+    return pd.read_csv(file_path, dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
 
 # Combine title and body
 def combine_title_body(row):
@@ -16,27 +18,43 @@ def combine_title_body(row):
     body = row['body'] if not pd.isna(row['body']) else ''
     return f"{title} {body}".strip()
 
-labelled_data['text'] = labelled_data.apply(combine_title_body, axis=1)
-unlabelled_data['text'] = unlabelled_data.apply(combine_title_body, axis=1)
+# Function to aggregate labelled data
+def aggregate_labelled_data(directory_path):
+    combined_data = []
+    for file_name in os.listdir(directory_path):
+        if file_name.endswith('_labelled.csv'):
+            file_path = os.path.join(directory_path, file_name)
+            data = load_data(file_path)
+            data['text'] = data.apply(combine_title_body, axis=1)
+            combined_data.append(data)
+    return pd.concat(combined_data, ignore_index=True)
 
-# Remove rows where both title and body are empty
-labelled_data = labelled_data[labelled_data['text'].str.strip().astype(bool)]
-unlabelled_data = unlabelled_data[unlabelled_data['text'].str.strip().astype(bool)]
+# Load and combine labelled data
+labelled_data_directory = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Labelled Data/UK'
+training_data = aggregate_labelled_data(labelled_data_directory)
+
+# Load test and context data
+test_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Test Data/Brexit_test.csv')
+context_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Context Handling/Brexit_context.csv')
+
+# Process test data
+test_data['text'] = test_data.apply(combine_title_body, axis=1)
+test_data = test_data[test_data['text'].str.strip().astype(bool)]
 
 # Context Handling
 def build_thread(data, comment_id):
-    thread = ""
+    thread = []
     try:
         parent_id = data.loc[data['id'] == comment_id, 'parent_id'].values[0]
     except IndexError:
-        return thread
+        return " ".join(thread)
 
     while parent_id:
         if parent_id.startswith('t1_'):
             parent_comment = data[data['id'] == parent_id[3:]]
             if not parent_comment.empty:
                 parent_comment = parent_comment.iloc[0]
-                thread = f"{parent_comment['body']}\n\n" + thread
+                thread.insert(0, parent_comment['body'])
                 parent_id = parent_comment['parent_id']
             else:
                 break
@@ -44,63 +62,63 @@ def build_thread(data, comment_id):
             parent_post = data[data['id'] == parent_id[3:]]
             if not parent_post.empty:
                 parent_post = parent_post.iloc[0]
-                thread = f"{parent_post['title']}\n\n{parent_post['body']}\n\n" + thread
+                thread.insert(0, f"{parent_post['title']} {parent_post['body']}")
             break
         else:
             break
-    return thread
+    return " ".join(thread)
 
-# Apply context handling
-labelled_data['context'] = labelled_data.apply(lambda x: build_thread(unlabelled_data, x['id']) + x['text'] if x['type'] == 'comment' else x['text'], axis=1)
-unlabelled_data['context'] = unlabelled_data.apply(lambda x: build_thread(unlabelled_data, x['id']) + x['text'] if x['type'] == 'comment' else x['text'], axis=1)
+training_data['context'] = training_data.apply(lambda x: build_thread(context_data, x['id']) + " " + x['text'] if x['type'] == 'comment' else x['text'], axis=1)
+test_data['context'] = test_data.apply(lambda x: build_thread(context_data, x['id']) + " " + x['text'] if x['type'] == 'comment' else x['text'], axis=1)
 
 # Drop unnecessary columns
-labelled_data = labelled_data.drop(columns=['title', 'body', 'id', 'author'])
-unlabelled_data = unlabelled_data.drop(columns=['title', 'body', 'id', 'author'])
+training_data = training_data.drop(columns=['title', 'body', 'id', 'author'])
+test_data = test_data.drop(columns=['title', 'body', 'id', 'author'])
 
 # TF-IDF Vectorization
 tfidf_vectorizer = TfidfVectorizer(max_features=5000)
-tfidf_matrix_labelled = tfidf_vectorizer.fit_transform(labelled_data['context'])
-tfidf_matrix_unlabelled = tfidf_vectorizer.transform(unlabelled_data['context'])
+tfidf_matrix_training = tfidf_vectorizer.fit_transform(training_data['context'])
+tfidf_matrix_test = tfidf_vectorizer.transform(test_data['context'])
 
 # Prepare data for each stance
 stances = ['pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
            'public_healthcare', 'private_healthcare', 'pro_israel', 'pro_palestine',
            'increase_tax', 'decrease_tax', 'neutral', 'irrelevant']
 
-# Perform 10-fold cross-validation for all stances simultaneously
-results = {stance: {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': []} for stance in stances}
+# Perform 10-fold cross-validation for each stance
+results = {}
 
-kf = KFold(n_splits=10, shuffle=True, random_state=42)
-for train_index, test_index in kf.split(tfidf_matrix_labelled):
-    train_vectors, test_vectors = tfidf_matrix_labelled[train_index], tfidf_matrix_labelled[test_index]
-    
-    for stance in stances:
-        train_labels = labelled_data[stance].values[train_index]
-        test_labels = labelled_data[stance].values[test_index]
-        
+def cross_validate_stance(stance, tfidf_matrix_training, labels):
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+    accuracy_scores = []
+    precision_scores = []
+    recall_scores = []
+    f1_scores = []
+
+    for train_index, test_index in skf.split(tfidf_matrix_training, labels):
+        train_vectors, test_vectors = tfidf_matrix_training[train_index], tfidf_matrix_training[test_index]
+        train_labels, test_labels = labels[train_index], labels[test_index]
+
         clf = LogisticRegression()
-        # clf = SVC(probability=True)
-        
         clf.fit(train_vectors, train_labels)
         predictions = clf.predict(test_vectors)
-        
-        acc = accuracy_score(test_labels, predictions)
-        precision, recall, f1, _ = precision_recall_fscore_support(test_labels, predictions, average='binary')
-        
-        results[stance]['accuracy'].append(acc)
-        results[stance]['precision'].append(precision)
-        results[stance]['recall'].append(recall)
-        results[stance]['f1_score'].append(f1)
 
-# Average the results
-for stance in stances:
-    results[stance] = {
-        'accuracy': np.mean(results[stance]['accuracy']),
-        'precision': np.mean(results[stance]['precision']),
-        'recall': np.mean(results[stance]['recall']),
-        'f1_score': np.mean(results[stance]['f1_score'])
+        acc = accuracy_score(test_labels, predictions)
+        precision, recall, f1, _ = precision_recall_fscore_support(test_labels, predictions, average='binary', zero_division=0)
+
+        accuracy_scores.append(acc)
+        precision_scores.append(precision)
+        recall_scores.append(recall)
+        f1_scores.append(f1)
+
+    return {
+        'accuracy': np.mean(accuracy_scores),
+        'precision': np.mean(precision_scores),
+        'recall': np.mean(recall_scores),
+        'f1_score': np.mean(f1_scores)
     }
+
+results = Parallel(n_jobs=-1)(delayed(cross_validate_stance)(stance, tfidf_matrix_training, training_data[stance].values) for stance in stances)
 
 # Post-processing to handle logical contradictions
 def resolve_contradictions(probabilities):
@@ -115,8 +133,7 @@ def resolve_contradictions(probabilities):
 
     for i, prob in enumerate(probabilities):
         prob_dict = {stance: prob[j] for j, stance in enumerate(stances)}
-        
-        # Check for irrelevant or neutral
+
         max_stance = max(prob_dict, key=prob_dict.get)
         if max_stance in ['irrelevant', 'neutral']:
             resolved_stances[i][stances.index(max_stance)] = 1
@@ -125,7 +142,7 @@ def resolve_contradictions(probabilities):
             if any_above_threshold:
                 for group in stance_groups:
                     max_stance = max(group, key=lambda x: prob_dict[x])
-                    if prob_dict[max_stance] > 0.5:  # Threshold can still be tuned
+                    if prob_dict[max_stance] > 0.5:
                         resolved_stances[i][stances.index(max_stance)] = 1
             else:
                 max_stance = max(prob_dict, key=prob_dict.get)
@@ -133,25 +150,23 @@ def resolve_contradictions(probabilities):
 
     return resolved_stances
 
-# Predicting on unlabelled data
-def predict_on_unlabelled_data():
+# Predicting on test data
+def predict_on_test_data():
     predictions = []
 
     for stance in stances:
-        clf = LogisticRegression()
-        # clf = SVC(probability=True)
-
-        clf.fit(tfidf_matrix_labelled, labelled_data[stance])  # Use the labelled data for fitting
-        stance_predictions = clf.predict_proba(tfidf_matrix_unlabelled)[:, 1]
+        clf = SVC(probability=True)
+        clf.fit(tfidf_matrix_training, training_data[stance])
+        stance_predictions = clf.predict_proba(tfidf_matrix_test)[:, 1]
         predictions.append(stance_predictions)
 
     predictions = np.array(predictions).transpose(1, 0)
     resolved_predictions = resolve_contradictions(predictions)
-    
+
     return resolved_predictions
 
 # Print the results
-for stance, metrics in results.items():
+for stance, metrics in zip(stances, results):
     print(f"Stance: {stance}")
     print(f"Accuracy: {metrics['accuracy']}")
     print(f"Precision: {metrics['precision']}")
@@ -159,5 +174,5 @@ for stance, metrics in results.items():
     print(f"F1 Score: {metrics['f1_score']}")
     print("\n")
 
-# Predict and resolve contradictions for unlabelled data
-resolved_predictions = predict_on_unlabelled_data()
+# Predict and resolve contradictions for test data
+resolved_predictions = predict_on_test_data()

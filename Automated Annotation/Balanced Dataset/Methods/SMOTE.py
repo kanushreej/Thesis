@@ -1,75 +1,72 @@
 import pandas as pd
 from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import LabelEncoder
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/Brexit_labelled.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv'
 df = pd.read_csv(file_path)
 
-# Filter the columns of interest
-columns_of_interest = ['pro_brexit', 'anti_brexit', 'neutral', 'irrelevant']
-df_interest = df[columns_of_interest]
+# Select the columns for balancing
+columns_to_balance = [
+    'pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction', 
+    'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine', 
+    'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant'
+]
 
-# Convert to integer type (if they are not already)
-df_interest = df_interest.fillna(0).astype(int)
+# Create the feature matrix (X) and the target variable (y)
+X_numeric = df[columns_to_balance]
+X_non_numeric = df.drop(columns=columns_to_balance)
 
-# Calculate counts of 0s and 1s for each column
-counts = df_interest.apply(pd.Series.value_counts).fillna(0).astype(int)
+# Convert non-numeric columns using Label Encoding
+label_encoders = {}
+for column in X_non_numeric.columns:
+    if X_non_numeric[column].dtype == 'object':
+        le = LabelEncoder()
+        X_non_numeric[column] = le.fit_transform(X_non_numeric[column].astype(str))
+        label_encoders[column] = le
 
-# Identify majority and minority classes
-majority_minority_info = {}
-for column in columns_of_interest:
-    count_0 = counts.at[0, column]
-    count_1 = counts.at[1, column]
-    majority_class = 0 if count_0 > count_1 else 1
-    minority_class = 1 if majority_class == 0 else 0
-    majority_count = max(count_0, count_1)
-    minority_count = min(count_0, count_1)
-    ratio = majority_count / minority_count if minority_count != 0 else 'Infinity'
-    
-    majority_minority_info[column] = {
-        'majority_class': majority_class,
-        'minority_class': minority_class,
-        'majority_count': majority_count,
-        'minority_count': minority_count,
-        'ratio': ratio
-    }
+# Convert y to a single column representing the class labels
+y_single_column = X_numeric.idxmax(axis=1)
 
-def resample_column_smote(data, majority_class, minority_class):
-    smote = SMOTE(sampling_strategy=0.3, random_state=42)
-    resampled_data, _ = smote.fit_resample(data.values.reshape(-1, 1), data)
-    return pd.Series(resampled_data.flatten())
+# Apply SMOTE to numeric columns only
+smote = SMOTE(random_state=42)
+X_resampled_numeric, y_resampled_single_column = smote.fit_resample(X_numeric, y_single_column)
 
-# Apply resampling to each column using SMOTE
-resampled_columns = {}
-for column, info in majority_minority_info.items():
-    if info['ratio'] > (70/30):
-        resampled_data = resample_column_smote(df_interest[column], 
-                                               info['majority_class'], 
-                                               info['minority_class'])
-        resampled_columns[column] = resampled_data
-        
-        # Debugging: Print the counts after resampling
-        print(f"Column: {column}")
-        print(resampled_data.value_counts())
+# Find nearest neighbors to impute non-numeric columns
+nn = NearestNeighbors(n_neighbors=1)
+nn.fit(X_numeric)
 
-# Verify the length of resampled data
-for column in resampled_columns.keys():
-    print(f"Original length of '{column}': {len(df[column])}")
-    print(f"Resampled length of '{column}': {len(resampled_columns[column])}")
+_, indices = nn.kneighbors(X_resampled_numeric)
+X_resampled_non_numeric = X_non_numeric.iloc[indices.flatten()].reset_index(drop=True)
 
-# Adjust the length of the original dataframe to match resampled data if necessary
-for column in resampled_columns.keys():
-    resampled_len = len(resampled_columns[column])
-    if len(df) < resampled_len:
-        df = df.reindex(range(resampled_len))
-    df[column] = resampled_columns[column].reset_index(drop=True)
+# Decode non-numeric columns back to their original text form
+for column in X_non_numeric.columns:
+    if column in label_encoders:
+        le = label_encoders[column]
+        X_resampled_non_numeric[column] = le.inverse_transform(X_resampled_non_numeric[column])
 
-# Save the modified dataframe to a new CSV file
-output_file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/Brexit_SMOTEBalanced.csv'
-df.to_csv(output_file_path, index=False)
+# Combine resampled numeric and non-numeric columns
+X_resampled = pd.concat([pd.DataFrame(X_resampled_numeric, columns=columns_to_balance), X_resampled_non_numeric], axis=1)
 
-# Verify the resampling results by reloading the saved file
-df_reloaded = pd.read_csv(output_file_path)
-reloaded_counts = df_reloaded[resampled_columns.keys()].apply(pd.Series.value_counts).fillna(0).astype(int)
-print("Reloaded Data Counts:")
-print(reloaded_counts)
+# Convert the resampled y back to the original multi-column format
+y_resampled = pd.get_dummies(y_resampled_single_column)
+
+# Ensure the combined DataFrame maintains the original structure and order
+df_resampled = pd.concat([X_resampled_non_numeric, pd.DataFrame(X_resampled_numeric, columns=columns_to_balance)], axis=1)
+for col in columns_to_balance:
+    df_resampled[col] = y_resampled[col]
+
+# Ensure the columns are in the same order as the original dataframe
+df_resampled = df_resampled[X_non_numeric.columns.tolist() + columns_to_balance]
+
+# Display the class distribution after resampling
+class_distribution_after = y_resampled.sum().to_frame(name='count').reset_index()
+print(class_distribution_after)
+
+# Save the resampled dataframe
+output_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/allUK_SMOTEbalanced.csv'
+df_resampled.to_csv(output_path, index=False)
+print(f"Resampled data saved to {output_path}")
+

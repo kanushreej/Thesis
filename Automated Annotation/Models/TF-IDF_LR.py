@@ -7,6 +7,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from imblearn.over_sampling import SMOTE
 import numpy as np
 from joblib import Parallel, delayed
+import sys
 
 # Function to load data
 def load_data(file_path):
@@ -24,31 +25,44 @@ tfidf_vectorizer = TfidfVectorizer(max_features=5000)
 tfidf_matrix_training = tfidf_vectorizer.fit_transform(training_data['context'])
 tfidf_matrix_test = tfidf_vectorizer.transform(test_data['context'])
 
-# Prepare data for each stance
+# Updated stances and stance groups
 stances = ['pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
            'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine',
            'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant']
 
-# Perform 10-fold cross-validation for each stance
-results = {}
+stance_groups = [
+    ['pro_brexit', 'anti_brexit'],
+    ['pro_climateAction', 'anti_climateAction'],
+    ['pro_NHS', 'anti_NHS'],
+    ['pro_israel', 'pro_palestine'],
+    ['pro_company_taxation', 'pro_worker_taxation']
+]
 
+# Perform cross-validation for each stance
 def cross_validate_stance(stance, tfidf_matrix_training, labels):
-    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+    # Determine the number of splits for cross-validation
+    min_class_count = np.min(np.bincount(labels.astype(int)))
+    n_splits = min(10, min_class_count)  # Adjust n_splits based on the smallest class size
+    
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     accuracy_scores = []
     precision_scores = []
     recall_scores = []
     f1_scores = []
 
-    smote = SMOTE(random_state=42)
-
     for train_index, test_index in skf.split(tfidf_matrix_training, labels):
         train_vectors, test_vectors = tfidf_matrix_training[train_index], tfidf_matrix_training[test_index]
-        train_labels, test_labels = labels[train_index], labels[test_index]
+        train_labels, test_labels = labels[train_index].astype(int), labels[test_index].astype(int)  # Ensure labels are integers
 
-        train_vectors_resampled, train_labels_resampled = smote.fit_resample(train_vectors, train_labels)
+        # Adjust k_neighbors for SMOTE based on the number of samples in the minority class
+        minority_class_count = min(np.bincount(train_labels))
+        k_neighbors = min(5, minority_class_count - 1) if minority_class_count > 1 else 1
+        if minority_class_count > 1:
+            smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
+            train_vectors, train_labels = smote.fit_resample(train_vectors, train_labels)
 
         clf = LogisticRegression()
-        clf.fit(train_vectors_resampled, train_labels_resampled)
+        clf.fit(train_vectors, train_labels)
         predictions = clf.predict(test_vectors)
 
         acc = accuracy_score(test_labels, predictions)
@@ -66,18 +80,24 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
         'f1_score': np.mean(f1_scores)
     }
 
-results = Parallel(n_jobs=-1)(delayed(cross_validate_stance)(stance, tfidf_matrix_training, training_data[stance].values) for stance in stances)
+# Run cross-validation in parallel and collect results
+results_list = Parallel(n_jobs=-1)(delayed(cross_validate_stance)(stance, tfidf_matrix_training, training_data[stance].values) for stance in stances)
+
+# Ensure results are correctly mapped to stances
+results = {stance: metrics for stance, metrics in zip(stances, results_list)}
+
+# Print the results
+for stance, metrics in results.items():
+    print(f"Stance: {stance}")
+    print(f"Accuracy: {metrics['accuracy']}")
+    print(f"Precision: {metrics['precision']}")
+    print(f"Recall: {metrics['recall']}")
+    print(f"F1 Score: {metrics['f1_score']}")
+    print("\n")
 
 # Post-processing to handle logical contradictions
 def resolve_contradictions(probabilities):
     resolved_stances = np.zeros_like(probabilities)
-    stance_groups = [
-        ['pro_brexit', 'anti_brexit'],
-        ['pro_climateAction', 'anti_climateAction'],
-        ['pro_NHS', 'anti_NHS'],
-        ['pro_israel', 'pro_palestine'],
-        ['pro_company_taxation', 'pro_worker_taxation']
-    ]
 
     for i, prob in enumerate(probabilities):
         prob_dict = {stance: prob[j] for j, stance in enumerate(stances)}
@@ -101,26 +121,29 @@ def resolve_contradictions(probabilities):
 # Predicting on test data
 def predict_on_test_data():
     predictions = []
+    actuals = []
 
     for stance in stances:
         clf = SVC(probability=True)
-        clf.fit(tfidf_matrix_training, training_data[stance])
-        stance_predictions = clf.predict_proba(tfidf_matrix_test)[:, 1]
+        clf.fit(tfidf_matrix_training, training_data[stance].astype(int))  # Ensure labels are integers
+        stance_predictions = clf.predict(tfidf_matrix_test)
         predictions.append(stance_predictions)
+        actuals.append(test_data[stance].values.astype(int))  # Ensure actual values are integers
 
     predictions = np.array(predictions).transpose(1, 0)
+    actuals = np.array(actuals).transpose(1, 0)
     resolved_predictions = resolve_contradictions(predictions)
 
-    return resolved_predictions
-
-# Print the results
-for stance, metrics in zip(stances, results):
-    print(f"Stance: {stance}")
-    print(f"Accuracy: {metrics['accuracy']}")
-    print(f"Precision: {metrics['precision']}")
-    print(f"Recall: {metrics['recall']}")
-    print(f"F1 Score: {metrics['f1_score']}")
-    print("\n")
+    return resolved_predictions, actuals
 
 # Predict and resolve contradictions for test data
-resolved_predictions = predict_on_test_data()
+resolved_predictions, actuals = predict_on_test_data()
+
+# Print counts of predicted vs actual values for each stance
+for i, stance in enumerate(stances):
+    predicted_counts = np.bincount(resolved_predictions[:, i])
+    actual_counts = np.bincount(actuals[:, i])
+    print(f"Stance: {stance}")
+    print(f"Predicted counts: {predicted_counts}")
+    print(f"Actual counts: {actual_counts}")
+    print("\n")

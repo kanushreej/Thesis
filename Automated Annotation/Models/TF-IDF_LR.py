@@ -15,15 +15,10 @@ def load_data(file_path):
 
 # Load preprocessed data
 training_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Labelled Data/UK/all_labelled_with_context.csv')
-test_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data/Brexit_data_with_context.csv')
-
-# Remove training data IDs from the test data
-test_data = test_data[~test_data['id'].isin(training_data['id'])]
 
 # TF-IDF Vectorization
 tfidf_vectorizer = TfidfVectorizer(max_features=5000)
 tfidf_matrix_training = tfidf_vectorizer.fit_transform(training_data['context'])
-tfidf_matrix_test = tfidf_vectorizer.transform(test_data['context'])
 
 # Updated stances and stance groups
 stances = ['pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
@@ -49,6 +44,8 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
     precision_scores = []
     recall_scores = []
     f1_scores = []
+    all_test_labels = np.array([], dtype=int)
+    all_predictions = np.array([], dtype=int)
 
     for train_index, test_index in skf.split(tfidf_matrix_training, labels):
         train_vectors, test_vectors = tfidf_matrix_training[train_index], tfidf_matrix_training[test_index]
@@ -61,7 +58,7 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
             smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
             train_vectors, train_labels = smote.fit_resample(train_vectors, train_labels)
 
-        clf = LogisticRegression()
+        clf = LogisticRegression(class_weight='balanced')
         clf.fit(train_vectors, train_labels)
         predictions = clf.predict(test_vectors)
 
@@ -72,12 +69,17 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
         precision_scores.append(precision)
         recall_scores.append(recall)
         f1_scores.append(f1)
+        
+        all_test_labels = np.concatenate((all_test_labels, test_labels))
+        all_predictions = np.concatenate((all_predictions, predictions))
 
     return {
         'accuracy': np.mean(accuracy_scores),
         'precision': np.mean(precision_scores),
         'recall': np.mean(recall_scores),
-        'f1_score': np.mean(f1_scores)
+        'f1_score': np.mean(f1_scores),
+        'test_labels': all_test_labels,
+        'predictions': all_predictions
     }
 
 # Run cross-validation in parallel and collect results
@@ -86,64 +88,17 @@ results_list = Parallel(n_jobs=-1)(delayed(cross_validate_stance)(stance, tfidf_
 # Ensure results are correctly mapped to stances
 results = {stance: metrics for stance, metrics in zip(stances, results_list)}
 
-# Print the results
+# Print the results and counts
 for stance, metrics in results.items():
     print(f"Stance: {stance}")
     print(f"Accuracy: {metrics['accuracy']}")
     print(f"Precision: {metrics['precision']}")
     print(f"Recall: {metrics['recall']}")
     print(f"F1 Score: {metrics['f1_score']}")
-    print("\n")
 
-# Post-processing to handle logical contradictions
-def resolve_contradictions(probabilities):
-    resolved_stances = np.zeros_like(probabilities)
-
-    for i, prob in enumerate(probabilities):
-        prob_dict = {stance: prob[j] for j, stance in enumerate(stances)}
-
-        max_stance = max(prob_dict, key=prob_dict.get)
-        if max_stance in ['irrelevant', 'neutral']:
-            resolved_stances[i][stances.index(max_stance)] = 1
-        else:
-            any_above_threshold = any(p > 0.5 for p in prob_dict.values())
-            if any_above_threshold:
-                for group in stance_groups:
-                    max_stance = max(group, key=lambda x: prob_dict[x])
-                    if prob_dict[max_stance] > 0.5:
-                        resolved_stances[i][stances.index(max_stance)] = 1
-            else:
-                max_stance = max(prob_dict, key=prob_dict.get)
-                resolved_stances[i][stances.index(max_stance)] = 1
-
-    return resolved_stances
-
-# Predicting on test data
-def predict_on_test_data():
-    predictions = []
-    actuals = []
-
-    for stance in stances:
-        clf = SVC(probability=True)
-        clf.fit(tfidf_matrix_training, training_data[stance].astype(int))  # Ensure labels are integers
-        stance_predictions = clf.predict(tfidf_matrix_test)
-        predictions.append(stance_predictions)
-        actuals.append(test_data[stance].values.astype(int))  # Ensure actual values are integers
-
-    predictions = np.array(predictions).transpose(1, 0)
-    actuals = np.array(actuals).transpose(1, 0)
-    resolved_predictions = resolve_contradictions(predictions)
-
-    return resolved_predictions, actuals
-
-# Predict and resolve contradictions for test data
-resolved_predictions, actuals = predict_on_test_data()
-
-# Print counts of predicted vs actual values for each stance
-for i, stance in enumerate(stances):
-    predicted_counts = np.bincount(resolved_predictions[:, i])
-    actual_counts = np.bincount(actuals[:, i])
-    print(f"Stance: {stance}")
+    # Print counts of predicted vs actual values
+    predicted_counts = np.bincount(metrics['predictions'])
+    actual_counts = np.bincount(metrics['test_labels'])
     print(f"Predicted counts: {predicted_counts}")
     print(f"Actual counts: {actual_counts}")
     print("\n")

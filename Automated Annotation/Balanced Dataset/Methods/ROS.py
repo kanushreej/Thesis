@@ -2,7 +2,7 @@ import pandas as pd
 from imblearn.over_sampling import RandomOverSampler
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled_with_context.csv'
 df = pd.read_csv(file_path)
 
 # Select the columns for balancing
@@ -34,4 +34,4 @@ class_distribution_after = y_resampled.sum().to_frame(name='count').reset_index(
 print(class_distribution_after)
 
 # Save the resampled dataframe
-df_resampled.to_csv('/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/allUK_ROSbalanced.csv', index=False)
+df_resampled.to_csv('/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/allUK_withcontext_ROSbalanced.csv', index=False)

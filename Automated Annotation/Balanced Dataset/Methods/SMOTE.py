@@ -5,7 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled_with_context.csv'
 df = pd.read_csv(file_path)
 
 # Select the columns for balancing
@@ -66,7 +66,7 @@ class_distribution_after = y_resampled.sum().to_frame(name='count').reset_index(
 print(class_distribution_after)
 
 # Save the resampled dataframe
-output_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/allUK_SMOTEbalanced.csv'
+output_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/allUK_withcontext_SMOTEbalanced.csv'
 df_resampled.to_csv(output_path, index=False)
 print(f"Resampled data saved to {output_path}")
 

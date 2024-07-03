@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/allUK_SMOTEbalanced.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/allUK_withcontext_ROSbalanced.csv'
 data = pd.read_csv(file_path)
 
 # Define the relevant columns for counting 0s and 1s

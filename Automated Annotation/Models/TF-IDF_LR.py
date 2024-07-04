@@ -1,12 +1,10 @@
 import pandas as pd
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import StandardScaler
 import numpy as np
-from joblib import Parallel, delayed
 import sys
 
 # Function to load data
@@ -14,32 +12,24 @@ def load_data(file_path):
     return pd.read_csv(file_path)
 
 # Load preprocessed data
-training_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Labelled Data/UK/all_labelled_with_context.csv')
+training_data = load_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/allUK_withcontext_ROSbalanced.csv')
 
 # TF-IDF Vectorization
-tfidf_vectorizer = TfidfVectorizer(max_features=5000)
+tfidf_vectorizer = TfidfVectorizer(max_features=3000)
 tfidf_matrix_training = tfidf_vectorizer.fit_transform(training_data['context'])
+
+# Scale the data
+scaler = StandardScaler(with_mean=False)
+tfidf_matrix_training = scaler.fit_transform(tfidf_matrix_training)
 
 # Updated stances and stance groups
 stances = ['pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
            'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine',
            'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant']
 
-stance_groups = [
-    ['pro_brexit', 'anti_brexit'],
-    ['pro_climateAction', 'anti_climateAction'],
-    ['pro_NHS', 'anti_NHS'],
-    ['pro_israel', 'pro_palestine'],
-    ['pro_company_taxation', 'pro_worker_taxation']
-]
-
 # Perform cross-validation for each stance
 def cross_validate_stance(stance, tfidf_matrix_training, labels):
-    # Determine the number of splits for cross-validation
-    min_class_count = np.min(np.bincount(labels.astype(int)))
-    n_splits = min(10, min_class_count)  # Adjust n_splits based on the smallest class size
-    
-    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     accuracy_scores = []
     precision_scores = []
     recall_scores = []
@@ -47,20 +37,16 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
     all_test_labels = np.array([], dtype=int)
     all_predictions = np.array([], dtype=int)
 
+    param_grid = {'C': [0.01, 0.1, 1, 10, 100]}
+    clf = GridSearchCV(LogisticRegression(class_weight='balanced', max_iter=500), param_grid, cv=5, scoring='f1')
+    
     for train_index, test_index in skf.split(tfidf_matrix_training, labels):
         train_vectors, test_vectors = tfidf_matrix_training[train_index], tfidf_matrix_training[test_index]
         train_labels, test_labels = labels[train_index].astype(int), labels[test_index].astype(int)  # Ensure labels are integers
 
-        # Adjust k_neighbors for SMOTE based on the number of samples in the minority class
-        minority_class_count = min(np.bincount(train_labels))
-        k_neighbors = min(5, minority_class_count - 1) if minority_class_count > 1 else 1
-        if minority_class_count > 1:
-            smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
-            train_vectors, train_labels = smote.fit_resample(train_vectors, train_labels)
-
-        clf = LogisticRegression(class_weight='balanced')
         clf.fit(train_vectors, train_labels)
-        predictions = clf.predict(test_vectors)
+        best_clf = clf.best_estimator_
+        predictions = best_clf.predict(test_vectors)
 
         acc = accuracy_score(test_labels, predictions)
         precision, recall, f1, _ = precision_recall_fscore_support(test_labels, predictions, average='binary', zero_division=0)
@@ -83,7 +69,7 @@ def cross_validate_stance(stance, tfidf_matrix_training, labels):
     }
 
 # Run cross-validation in parallel and collect results
-results_list = Parallel(n_jobs=-1)(delayed(cross_validate_stance)(stance, tfidf_matrix_training, training_data[stance].values) for stance in stances)
+results_list = [cross_validate_stance(stance, tfidf_matrix_training, training_data[stance].values) for stance in stances]
 
 # Ensure results are correctly mapped to stances
 results = {stance: metrics for stance, metrics in zip(stances, results_list)}
@@ -102,3 +88,6 @@ for stance, metrics in results.items():
     print(f"Predicted counts: {predicted_counts}")
     print(f"Actual counts: {actual_counts}")
     print("\n")
+
+# Terminate the script
+sys.exit(0)

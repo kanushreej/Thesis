@@ -1,72 +1,49 @@
 import pandas as pd
-from imblearn.over_sampling import SMOTE
-from sklearn.preprocessing import LabelEncoder
-from sklearn.neighbors import NearestNeighbors
 import numpy as np
+from imblearn.over_sampling import SMOTE
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled_with_context.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/Brexit_preprocessed.csv'
 df = pd.read_csv(file_path)
 
-# Select the columns for balancing
-columns_to_balance = [
-    'pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction', 
-    'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine', 
-    'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant'
-]
+# Function to convert string representation of list to numpy array
+def str_to_array(s):
+    return np.fromstring(s.strip("[]"), sep=' ')
 
-# Create the feature matrix (X) and the target variable (y)
-X_numeric = df[columns_to_balance]
-X_non_numeric = df.drop(columns=columns_to_balance)
+# Combine text_vector and context_vector to form the feature set
+features = df['text_vector'].apply(str_to_array).tolist()
+context = df['context_vector'].apply(str_to_array).tolist()
+X = np.array([np.concatenate((f, c)) for f, c in zip(features, context)])
 
-# Convert non-numeric columns using Label Encoding
-label_encoders = {}
-for column in X_non_numeric.columns:
-    if X_non_numeric[column].dtype == 'object':
-        le = LabelEncoder()
-        X_non_numeric[column] = le.fit_transform(X_non_numeric[column].astype(str))
-        label_encoders[column] = le
+# Target columns
+targets = ['pro_brexit', 'anti_brexit', 'neutral', 'irrelevant']
 
-# Convert y to a single column representing the class labels
-y_single_column = X_numeric.idxmax(axis=1)
+# Initialize an array to hold the combined resampled targets
+y_combined = np.array(df[targets])
 
-# Apply SMOTE to numeric columns only
-smote = SMOTE(random_state=42)
-X_resampled_numeric, y_resampled_single_column = smote.fit_resample(X_numeric, y_single_column)
+# Apply SMOTE to the combined target array
+smote = SMOTE()
+X_resampled, y_resampled_combined = smote.fit_resample(X, y_combined)
 
-# Find nearest neighbors to impute non-numeric columns
-nn = NearestNeighbors(n_neighbors=1)
-nn.fit(X_numeric)
+# Split the resampled features back into text_vector and context_vector
+text_vector_length = len(str_to_array(df['text_vector'].iloc[0]))
+context_vector_length = len(str_to_array(df['context_vector'].iloc[0]))
 
-_, indices = nn.kneighbors(X_resampled_numeric)
-X_resampled_non_numeric = X_non_numeric.iloc[indices.flatten()].reset_index(drop=True)
+text_vectors_resampled = X_resampled[:, :text_vector_length]
+context_vectors_resampled = X_resampled[:, text_vector_length:]
 
-# Decode non-numeric columns back to their original text form
-for column in X_non_numeric.columns:
-    if column in label_encoders:
-        le = label_encoders[column]
-        X_resampled_non_numeric[column] = le.inverse_transform(X_resampled_non_numeric[column])
+# Create a new DataFrame with the resampled data
+resampled_data = pd.DataFrame()
+resampled_data['text_vector'] = list(text_vectors_resampled)
+resampled_data['context_vector'] = list(context_vectors_resampled)
 
-# Combine resampled numeric and non-numeric columns
-X_resampled = pd.concat([pd.DataFrame(X_resampled_numeric, columns=columns_to_balance), X_resampled_non_numeric], axis=1)
+# Add the target columns
+for i, target in enumerate(targets):
+    resampled_data[target] = y_resampled_combined[:, i]
 
-# Convert the resampled y back to the original multi-column format
-y_resampled = pd.get_dummies(y_resampled_single_column)
+# Save the resampled dataset to a CSV file
+resampled_data.to_csv('/Users/kanushreejaiswal/Desktop/Brexit_resampled.csv', index=False)
 
-# Ensure the combined DataFrame maintains the original structure and order
-df_resampled = pd.concat([X_resampled_non_numeric, pd.DataFrame(X_resampled_numeric, columns=columns_to_balance)], axis=1)
-for col in columns_to_balance:
-    df_resampled[col] = y_resampled[col]
-
-# Ensure the columns are in the same order as the original dataframe
-df_resampled = df_resampled[X_non_numeric.columns.tolist() + columns_to_balance]
-
-# Display the class distribution after resampling
-class_distribution_after = y_resampled.sum().to_frame(name='count').reset_index()
-print(class_distribution_after)
-
-# Save the resampled dataframe
-output_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/SMOTE/allUK_withcontext_SMOTEbalanced.csv'
-df_resampled.to_csv(output_path, index=False)
-print(f"Resampled data saved to {output_path}")
+# Display the first few rows of the resampled dataset
+print(resampled_data.head())
 

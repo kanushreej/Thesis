@@ -7,14 +7,14 @@ from sklearn.metrics import classification_report, precision_score, recall_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 
-'''# Base directory and file paths
+# Base directory and file paths
 base_directory = "C:/Users/rapha/Documents/CS_VU/Thesis"
 moderator_name = "Raphael"
 issue = "Brexit"
-team = "UK"'''
+team = "UK"
 
 # Load full data containing the text of all posts/comments
-full_data = pd.read_csv("/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv")
+full_data = pd.read_csv(f"{base_directory}/Thesis/Subreddit Data/{team}/{issue}_data.csv")
 
 # Convert full data to a dictionary for quick lookup
 id_to_text = pd.Series(full_data.body.values, index=full_data.id).to_dict()
@@ -24,7 +24,7 @@ def fetch_parent_text(parent_id):
     return id_to_text.get(parent_id, "")
 
 # Load labeled data
-labeled_data = pd.read_csv("/Users/kanushreejaiswal/Desktop/Brexit_ROSallbalanced.csv")
+labeled_data = pd.read_csv(f"{base_directory}/Thesis/Automated Annotation/Balanced Dataset/{team}/ROS/all{team}_ROSbalanced.csv")
 
 # Fetch and merge parent post text with comment text
 def merge_parent_post(data):
@@ -62,7 +62,7 @@ svm = NuSVC()
 
 # Define the parameter grid
 param_grid = {
-    'estimator__nu': [0.1, 0.3, 0.5],
+    'estimator__nu': [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5],
     'estimator__kernel': ['linear', 'rbf', 'poly'],
     'estimator__gamma': ['scale', 'auto']
 }

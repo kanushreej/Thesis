@@ -1,14 +1,12 @@
 import pandas as pd
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Brexit_resampled.csv'
 data = pd.read_csv(file_path)
 
 # Define the relevant columns for counting 0s and 1s
 relevant_columns = [
-    'pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction', 
-    'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine', 
-    'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant'
+    'pro_brexit', 'anti_brexit', 'neutral', 'irrelevant'
 ]
 
 # Function to count 0s and 1s in each relevant column

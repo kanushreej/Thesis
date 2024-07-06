@@ -187,7 +187,7 @@ def classify_issue(issue):
         predictions = []
 
         for stance in stances:
-            clf = SVC(probability=True, class_weight='balanced')
+            clf = LogisticRegression(max_iter=1000, class_weight='balanced')
             clf.fit(X, y[stance])
             stance_predictions = clf.predict_proba(X)[:, 1]
             predictions.append(stance_predictions)

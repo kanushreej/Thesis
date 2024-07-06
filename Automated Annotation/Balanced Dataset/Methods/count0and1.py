@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the dataset
-file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Balanced Dataset/UK/ROS/allUK_withcontext_ROSbalanced.csv'
+file_path = '/Users/kanushreejaiswal/Desktop/Thesis/Automated Annotation/Labelled Data/UK/all_labelled.csv'
 data = pd.read_csv(file_path)
 
 # Define the relevant columns for counting 0s and 1s
@@ -29,3 +29,4 @@ for column, count in counts.items():
     print(f"{column}:")
     print(f"  0s: {count['0s']}")
     print(f"  1s: {count['1s']}")
+    print("ratio:",count['0s']/count['1s'] )

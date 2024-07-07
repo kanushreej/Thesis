@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from sklearn.svm import SVC
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler
 
@@ -116,12 +116,18 @@ def classify_issue(issue):
 
         return resolved_stances
 
-    def evaluate_model(X, y, stances, n_splits=10):
+    def evaluate_model(X, y, stances, n_splits=10, random_state=42):
         results = {stance: {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': [], 'predictions': [], 'test_labels': []} for stance in stances}
         overall_predictions = []
         overall_true_labels = []
 
-        skf = StratifiedKFold(n_splits=n_splits)
+        skf = StratifiedKFold(n_splits=n_splits, random_state=random_state, shuffle=True)
+
+        param_grid = {
+            'C': [0.1, 1, 10, 100],
+            'gamma': [1, 0.1, 0.01, 0.001],
+            'kernel': ['rbf', 'linear']
+        }
 
         for train_index, test_index in skf.split(X, y['neutral']):  # Using 'neutral' just for stratification
             X_train, X_test = X[train_index], X[test_index]
@@ -129,9 +135,12 @@ def classify_issue(issue):
 
             for stance in stances:
                 clf = SVC(probability=True, class_weight='balanced')
-                clf.fit(X_train, y_train[stance])
+                grid_search = GridSearchCV(clf, param_grid, scoring='f1', cv=3)
+                grid_search.fit(X_train, y_train[stance])
 
-                y_pred_prob = clf.predict_proba(X_test)[:, 1]
+                best_clf = grid_search.best_estimator_
+
+                y_pred_prob = best_clf.predict_proba(X_test)[:, 1]
                 y_pred = (y_pred_prob > 0.5).astype(int)
 
                 results[stance]['accuracy'].append(accuracy_score(y_test[stance], y_pred))

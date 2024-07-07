@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from sklearn.naive_bayes import GaussianNB
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler
 
@@ -123,15 +123,21 @@ def classify_issue(issue):
 
         skf = StratifiedKFold(n_splits=n_splits)
 
-        for train_index, test_index in skf.split(X, y['neutral']):  # Using 'neutral' just for stratification
+        param_grid = {
+            'var_smoothing': np.logspace(-10, 0, 20)
+        }
+
+        for train_index, test_index in skf.split(X, y['neutral']):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
             for stance in stances:
                 clf = GaussianNB()
-                clf.fit(X_train, y_train[stance])
+                grid_search = GridSearchCV(clf, param_grid, scoring='f1', cv=5)
+                grid_search.fit(X_train, y_train[stance])
+                best_clf = grid_search.best_estimator_
 
-                y_pred_prob = clf.predict_proba(X_test)[:, 1]
+                y_pred_prob = best_clf.predict_proba(X_test)[:, 1]
                 y_pred = (y_pred_prob > 0.5).astype(int)
 
                 results[stance]['accuracy'].append(accuracy_score(y_test[stance], y_pred))
@@ -182,6 +188,7 @@ def classify_issue(issue):
 
         overall_metrics_df = pd.DataFrame(overall_metrics)
         print("Overall Performance Metrics by Stance:\n", overall_metrics_df)
+
 
     def predict_and_resolve(X, stances):
         predictions = []

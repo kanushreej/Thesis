@@ -7,8 +7,8 @@ from nltk.tokenize import word_tokenize
 from gensim.models import Word2Vec
 import numpy as np
 
-#nltk.download('punkt')
-#nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('stopwords')
 
 stop_words = set(stopwords.words('english'))
 
@@ -16,12 +16,17 @@ stop_words = set(stopwords.words('english'))
 def load_data(file_path):
     return pd.read_csv(file_path, dtype={'parent_id': str, 'body': str, 'title': str, 'id': str})
 
-# Function to clean text
-def clean_text(text):
+# Function to clean text (stop before stop word removal)
+def preprocess_text(text):
     text = text.lower()  # Convert to lowercase
     text = re.sub(r'\d+', '', text)  # Remove numbers
     text = re.sub(r'\W+', ' ', text)  # Remove special characters
     text = re.sub(r'http\S+|www\S+', '', text)  # Remove URLs
+    return text
+
+# Function to clean and tokenize text
+def clean_text(text):
+    text = preprocess_text(text)
     tokens = word_tokenize(text)  # Tokenize text
     tokens = [word for word in tokens if word not in stop_words]  # Remove stop words
     return tokens
@@ -33,13 +38,21 @@ def combine_title_body(row):
     combined_text = f"{title} {body}".strip()
     return clean_text(combined_text)
 
+# Combine title and body without tokenization
+def combine_title_body_raw(row):
+    title = row['title'] if not pd.isna(row['title']) else ''
+    body = row['body'] if not pd.isna(row['body']) else ''
+    combined_text = f"{title} {body}".strip()
+    return preprocess_text(combined_text)
+
 # Context Handling
 def build_thread(data, comment_id):
     thread = []
+    thread_raw = []
     try:
         parent_id = data.loc[data['id'] == comment_id, 'parent_id'].values[0]
     except IndexError:
-        return thread
+        return thread, thread_raw
 
     while parent_id:
         if parent_id.startswith('t1_'):  # Comment
@@ -47,8 +60,10 @@ def build_thread(data, comment_id):
             if not parent_comment.empty:
                 parent_comment = parent_comment.iloc[0]
                 parent_text = parent_comment['body'] if not pd.isna(parent_comment['body']) else ''
-                parent_text = clean_text(parent_text)
-                thread = parent_text + thread
+                cleaned_parent_text = clean_text(parent_text)
+                raw_parent_text = preprocess_text(parent_text)
+                thread = cleaned_parent_text + thread
+                thread_raw = [raw_parent_text] + thread_raw
                 parent_id = parent_comment['parent_id']
             else:
                 break
@@ -58,13 +73,16 @@ def build_thread(data, comment_id):
                 parent_post = parent_post.iloc[0]
                 parent_title = parent_post['title'] if not pd.isna(parent_post['title']) else ''
                 parent_body = parent_post['body'] if not pd.isna(parent_post['body']) else ''
-                parent_title = clean_text(parent_title)
-                parent_body = clean_text(parent_body)
-                thread = parent_title + parent_body + thread
+                cleaned_parent_title = clean_text(parent_title)
+                cleaned_parent_body = clean_text(parent_body)
+                raw_parent_title = preprocess_text(parent_title)
+                raw_parent_body = preprocess_text(parent_body)
+                thread = cleaned_parent_title + cleaned_parent_body + thread
+                thread_raw = [raw_parent_title + ' ' + raw_parent_body] + thread_raw
             break
         else:
             break
-    return thread
+    return thread, ' '.join(thread_raw)
 
 # Function to combine all contextual data for labeled data
 def combine_all_contextual_data(directory_path):
@@ -74,6 +92,7 @@ def combine_all_contextual_data(directory_path):
             file_path = os.path.join(directory_path, file_name)
             data = load_data(file_path)
             data['text'] = data.apply(combine_title_body, axis=1)
+            data['text_raw'] = data.apply(combine_title_body_raw, axis=1)
             combined_data.append(data)
     return pd.concat(combined_data, ignore_index=True)
 
@@ -97,6 +116,7 @@ def preprocess_labelled_data(data_file, context_directory, output_file):
     
     # Combine title and body
     data['text'] = data.apply(combine_title_body, axis=1)
+    data['text_raw'] = data.apply(combine_title_body_raw, axis=1)
     
     # Remove rows where both title and body are empty
     data = data[data['text'].apply(lambda x: len(x) > 0)]
@@ -113,11 +133,12 @@ def preprocess_labelled_data(data_file, context_directory, output_file):
     # Apply context handling
     def build_context(row):
         if row['type'] == 'comment':
-            thread = build_thread(context_data, row['id'])
-            return thread
-        return []
+            thread, thread_raw = build_thread(context_data, row['id'])
+            return thread, thread_raw
+        return [], ''
 
-    data['context'] = data.apply(build_context, axis=1)
+    context_result = data.apply(build_context, axis=1)
+    data['context'], data['context_raw'] = zip(*context_result)
 
     # Vectorize text and context
     data['text_vector'] = data['text'].apply(lambda x: vectorize_text(word2vec_model, x))
@@ -133,6 +154,7 @@ def preprocess_unlabelled_data(data_file, output_file):
     
     # Combine title and body
     data['text'] = data.apply(combine_title_body, axis=1)
+    data['text_raw'] = data.apply(combine_title_body_raw, axis=1)
     
     # Remove rows where both title and body are empty
     data = data[data['text'].apply(lambda x: len(x) > 0)]
@@ -149,11 +171,12 @@ def preprocess_unlabelled_data(data_file, output_file):
     # Apply context handling
     def build_context(row):
         if row['type'] == 'comment':
-            thread = build_thread(context_data, row['id'])
-            return thread
-        return []
+            thread, thread_raw = build_thread(context_data, row['id'])
+            return thread, thread_raw
+        return [], ''
 
-    data['context'] = data.apply(build_context, axis=1)
+    context_result = data.apply(build_context, axis=1)
+    data['context'], data['context_raw'] = zip(*context_result)
 
     # Vectorize text and context
     data['text_vector'] = data['text'].apply(lambda x: vectorize_text(word2vec_model, x))
@@ -163,7 +186,7 @@ def preprocess_unlabelled_data(data_file, output_file):
     data.to_csv(output_file, index=False)
 
 # Preprocess labeled data
-preprocess_labelled_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/TaxationUK_labelled.csv',
+preprocess_labelled_data('//Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/TaxationUK_training.csv',
                          '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data',
                          '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/TaxationUK_training.csv')
 

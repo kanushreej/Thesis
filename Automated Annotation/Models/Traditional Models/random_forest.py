@@ -91,13 +91,13 @@ def classify_issue(issue):
         skf = StratifiedKFold(n_splits=n_splits)
 
         adjusted_params = {
-            'pro_brexit': {'max_depth': 60, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100},
-            'anti_brexit': {'max_depth': 60, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100},
-            'neutral': {'max_depth': 60, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100},
-            'irrelevant': {'max_depth': 60, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100}
+            'pro_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100},
+            'anti_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100},
+            'neutral': {'max_depth': None, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 100},
+            'irrelevant': {'max_depth': None, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 100}
         }
 
-        for train_index, test_index in skf.split(X, y['neutral']):  # Using 'neutral' just for stratification
+        for train_index, test_index in skf.split(X, y['anti_brexit']):  # Using 'neutral' just for stratification
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 

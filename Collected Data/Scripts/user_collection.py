@@ -89,8 +89,8 @@ def collect_unique_users(data_dir, output_dir):
         print(f"Data for {issue_name} updated in {user_data_file}")
 
 def main():
-    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK"
-    output_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/User Data"
+    data_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data"
+    output_dir = "/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/User Data"
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

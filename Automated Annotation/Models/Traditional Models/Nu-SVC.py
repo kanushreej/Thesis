@@ -22,7 +22,7 @@ def classify_issue(issue):
     
     targets = stance_groups[issue] + ['neutral', 'irrelevant']
 
-    file_path = 'C:/Users/rapha/Documents/CS_VU/Thesis/Thesis/Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
+    file_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
     df = pd.read_csv(file_path)
 
     ## SMOTE ##

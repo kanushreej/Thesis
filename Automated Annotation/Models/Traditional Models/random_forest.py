@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, learning_curve
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.preprocessing import StandardScaler
 import os
@@ -83,85 +84,89 @@ def classify_issue(issue):
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    def evaluate_model(X, y, stances, n_splits=10):
-        results = {stance: {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': [], 'predictions': [], 'test_labels': []} for stance in stances}
-        overall_predictions = []
-        overall_true_labels = []
-
-        skf = StratifiedKFold(n_splits=n_splits)
+    def evaluate_model(X, y, stances, n_splits=5):
+        overall_train_scores = []
+        overall_val_scores = []
+        overall_train_sizes = None
+        results = {stance: {'train_sizes': [], 'train_scores': [], 'val_scores': [], 'metrics': {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': []}} for stance in stances}
 
         adjusted_params = {
-            'pro_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 2, 'n_estimators': 50},
-            'anti_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 50},
-            'neutral': {'max_depth': None, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 200},
-            'irrelevant': {'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 200}
+            'pro_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 2, 'n_estimators': 250},
+            'anti_brexit': {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 2, 'n_estimators': 200},
+            'neutral': {'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 2, 'n_estimators': 250},
+            'irrelevant': {'max_depth': 15, 'max_features': 'sqrt', 'min_samples_leaf': 4, 'min_samples_split': 2, 'n_estimators': 250}
         }
 
-        for train_index, test_index in skf.split(X, y['anti_brexit']):  # Using 'neutral' just for stratification
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
-            for stance in stances:
-                clf = RandomForestClassifier(
-                    max_depth=adjusted_params[stance]['max_depth'],
-                    max_features=adjusted_params[stance]['max_features'],
-                    min_samples_leaf=adjusted_params[stance]['min_samples_leaf'],
-                    min_samples_split=adjusted_params[stance]['min_samples_split'],
-                    n_estimators=adjusted_params[stance]['n_estimators'],
-                    random_state=42
-                )
+        overall_metrics = {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': []}
+
+        for stance in stances:
+            clf = RandomForestClassifier(
+                max_depth=adjusted_params[stance]['max_depth'],
+                max_features=adjusted_params[stance]['max_features'],
+                min_samples_leaf=adjusted_params[stance]['min_samples_leaf'],
+                min_samples_split=adjusted_params[stance]['min_samples_split'],
+                n_estimators=adjusted_params[stance]['n_estimators'],
+                random_state=42
+            )
+
+            train_sizes, train_scores, val_scores = learning_curve(
+                clf, X, y[stance], cv=StratifiedKFold(n_splits=n_splits), 
+                scoring='recall', train_sizes=np.linspace(0.1, 1.0, 10), n_jobs=-1
+            )
+
+            if overall_train_sizes is None:
+                overall_train_sizes = train_sizes
+
+            overall_train_scores.append(np.mean(train_scores, axis=1))
+            overall_val_scores.append(np.mean(val_scores, axis=1))
+
+            results[stance]['train_sizes'] = train_sizes
+            results[stance]['train_scores'] = np.mean(train_scores, axis=1)
+            results[stance]['val_scores'] = np.mean(val_scores, axis=1)
+
+            for train_index, test_index in StratifiedKFold(n_splits=n_splits).split(X, y[stance]):
+                X_train, X_test = X[train_index], X[test_index]
+                y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
                 clf.fit(X_train, y_train[stance])
-
                 y_pred = clf.predict(X_test)
 
-                results[stance]['accuracy'].append(accuracy_score(y_test[stance], y_pred))
-                results[stance]['precision'].append(precision_score(y_test[stance], y_pred, zero_division=0))
-                results[stance]['recall'].append(recall_score(y_test[stance], y_pred, zero_division=0))
-                results[stance]['f1_score'].append(f1_score(y_test[stance], y_pred, zero_division=0))
-                results[stance]['predictions'].extend(y_pred)
-                results[stance]['test_labels'].extend(y_test[stance])
+                accuracy = accuracy_score(y_test[stance], y_pred)
+                precision = precision_score(y_test[stance], y_pred, zero_division=0)
+                recall = recall_score(y_test[stance], y_pred, zero_division=0)
+                f1 = f1_score(y_test[stance], y_pred, zero_division=0)
 
-                overall_predictions.extend(y_pred)
-                overall_true_labels.extend(y_test[stance])
+                results[stance]['metrics']['accuracy'].append(accuracy)
+                results[stance]['metrics']['precision'].append(precision)
+                results[stance]['metrics']['recall'].append(recall)
+                results[stance]['metrics']['f1_score'].append(f1)
 
-        overall_metrics = {'Stance': [], 'Accuracy': [], 'Precision': [], 'Recall': [], 'F1 Score': []}
-        
-        for stance, metrics in results.items():
-            accuracy = np.mean(metrics['accuracy'])
-            precision = np.mean(metrics['precision'])
-            recall = np.mean(metrics['recall'])
-            f1 = np.mean(metrics['f1_score'])
+                overall_metrics['accuracy'].append(accuracy)
+                overall_metrics['precision'].append(precision)
+                overall_metrics['recall'].append(recall)
+                overall_metrics['f1_score'].append(f1)
 
-            overall_metrics['Stance'].append(stance)
-            overall_metrics['Accuracy'].append(accuracy)
-            overall_metrics['Precision'].append(precision)
-            overall_metrics['Recall'].append(recall)
-            overall_metrics['F1 Score'].append(f1)
-            
-            print(f"Stance: {stance}")
-            print(f"Accuracy: {accuracy}")
-            print(f"Precision: {precision}")
-            print(f"Recall: {recall}")
-            print(f"F1 Score: {f1}")
+        # Average scores across all stances
+        avg_train_scores = np.mean(overall_train_scores, axis=0)
+        avg_val_scores = np.mean(overall_val_scores, axis=0)
 
-            predicted_counts = np.bincount(metrics['predictions'])
-            actual_counts = np.bincount(metrics['test_labels'])
-            print(f"Predicted counts: {predicted_counts}")
-            print(f"Actual counts: {actual_counts}")
-            print("\n")
+        plt.figure()
+        plt.plot(overall_train_sizes, avg_train_scores, label='Training score')
+        plt.plot(overall_train_sizes, avg_val_scores, label='Cross-validation score')
+        plt.xlabel('Training Examples')
+        plt.ylabel('Recall')
+        plt.ylim(0.0, 1.0)
+        plt.title('Average Learning Curve for All Stances')
+        plt.legend(loc='best')
+        plt.grid()
+        plt.show()
 
-        overall_accuracy = accuracy_score(overall_true_labels, overall_predictions)
-        overall_precision = precision_score(overall_true_labels, overall_predictions, zero_division=0)
-        overall_recall = recall_score(overall_true_labels, overall_predictions, zero_division=0)
-        overall_f1 = f1_score(overall_true_labels, overall_predictions, zero_division=0)
-
-        print(f"Overall Accuracy: {overall_accuracy}")
-        print(f"Overall Precision: {overall_precision}")
-        print(f"Overall Recall: {overall_recall}")
-        print(f"Overall F1 Score: {overall_f1}")
-
-        overall_metrics_df = pd.DataFrame(overall_metrics)
-        print("Overall Performance Metrics by Stance:\n", overall_metrics_df)
+        print("\nOverall Metrics:")
+        print(f"Accuracy: {np.mean(overall_metrics['accuracy']):.4f}")
+        print(f"Precision: {np.mean(overall_metrics['precision']):.4f}")
+        print(f"Recall: {np.mean(overall_metrics['recall']):.4f}")
+        print(f"F1 Score: {np.mean(overall_metrics['f1_score']):.4f}")
 
     evaluate_model(X, y, targets)
 

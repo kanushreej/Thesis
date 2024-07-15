@@ -11,10 +11,8 @@ import seaborn as sns
 from sklearn.decomposition import PCA
 import pickle
 
-sns.set(style="whitegrid")
-
-TEXT_VECTOR_SIZE = 100
-CONTEXT_VECTOR_SIZE = 1000
+TEXT_VECTOR_SIZE = 150
+CONTEXT_VECTOR_SIZE = 250
 
 def classify_issue(issue):
     stance_groups = {
@@ -195,7 +193,7 @@ def evaluate_model(X, y, stances, n_splits=10, random_state=42):
     return best_clf, overall_metrics_df
 
 def save_model(model, issue):
-    model_filename = f'{issue}_svm_model.pkl'
+    model_filename = f'Automated Annotation/Models/Trained Models/SVM/{issue}_svm_model.pkl'
     with open(model_filename, 'wb') as file:
         pickle.dump(model, file)
 

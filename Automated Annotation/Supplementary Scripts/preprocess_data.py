@@ -186,10 +186,10 @@ def preprocess_unlabelled_data(data_file, output_file):
     data.to_csv(output_file, index=False)
 
 # Preprocess labeled data
-preprocess_labelled_data('//Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/US/TaxationUS_labelled.csv',
-                         '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/US/Subreddit Data',
-                         '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/US/TaxationUS_training.csv')
+#preprocess_labelled_data('//Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/US/TaxationUS_labelled.csv',
+#                         '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/US/Subreddit Data',
+#                         '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/US/TaxationUS_training.csv')
 
 # Preprocess unlabeled data
-# preprocess_unlabelled_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data/Brexit_data.csv',
-#                            '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data/Brexit_data_with_context.csv')
+preprocess_unlabelled_data('/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/UK/Subreddit Data/Brexit_data.csv',
+                            '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Analyses/Subbreddit Data/UK/Brexit_data_with_context.csv')

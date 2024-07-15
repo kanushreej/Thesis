@@ -53,5 +53,5 @@ def main(file_path):
             print("No changes made to the file.")
 
 if __name__ == '__main__':
-    file_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Subreddit Data/UK/Brexit_data.csv'
+    file_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Collected Data/US/Subreddit Data/ClimateChangeUS_data.csv'
     main(file_path)

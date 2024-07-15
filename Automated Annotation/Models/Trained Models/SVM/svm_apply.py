@@ -7,8 +7,8 @@ import pickle
 TEXT_VECTOR_SIZE = 150
 CONTEXT_VECTOR_SIZE = 250
 
-issue = 'IsraelPalestineUS'
-data_path = 'Analyses/Preprocessed Data/US/IsraelPalestineUS_preprocessed.csv'  # Update with the actual path to data
+issue = 'Brexit'
+data_path = 'Analyses/Preprocessed Data/UK/Brexit_preprocessed.csv'  # Update with the actual path to data
 output_path = 'Analyses/Labelled Data'  # Update with the actual path to Analyses/Labelled Data
 
 def load_model(issue):

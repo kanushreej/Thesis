@@ -14,7 +14,7 @@ import pickle
 TEXT_VECTOR_SIZE = 150
 CONTEXT_VECTOR_SIZE = 250
 
-issue = 'Brexit'
+issue = 'Brexit' # Change to your issue
 
 def classify_issue(issue):
     stance_groups = {

@@ -7,8 +7,8 @@ import pickle
 TEXT_VECTOR_SIZE = 150
 CONTEXT_VECTOR_SIZE = 250
 
-issue = 'Brexit'
-data_path = 'Analyses/Preprocessed Data/UK/Brexit_preprocessed.csv'  # Update with the actual path to data
+issue = 'ImmigrationUS'
+data_path = 'Analyses/Preprocessed Data/US/ImmigrationUS_preprocessed.csv'  # Update with the actual path to data
 output_path = 'Analyses/Labelled Data'  # Update with the actual path to Analyses/Labelled Data
 
 def load_model(issue):
@@ -65,7 +65,7 @@ def predict_data(issue, data_path, output_path):
 
     # Define the targets based on the issue
     stance_groups = {
-        'brexit': ['pro_brexit', 'anti_brexit'],
+        'Brexit': ['pro_brexit', 'anti_brexit'],
         'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
         'HealthcareUK': ['pro_NHS', 'anti_NHS'],
         'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],

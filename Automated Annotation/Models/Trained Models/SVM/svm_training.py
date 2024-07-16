@@ -14,7 +14,7 @@ import pickle
 TEXT_VECTOR_SIZE = 150
 CONTEXT_VECTOR_SIZE = 250
 
-issue = 'Brexit' # Change to your issue
+issue = 'ImmigrationUS' # Change to your issue
 
 def classify_issue(issue):
     stance_groups = {
@@ -36,7 +36,7 @@ def classify_issue(issue):
     
     targets = stance_groups[issue] + ['neutral', 'irrelevant']
 
-    file_path = 'Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
+    file_path = 'Automated Annotation/Training Data/US/{}_training.csv'.format(issue)
     df = pd.read_csv(file_path)
 
     ## SMOTE ##

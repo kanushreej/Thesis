@@ -14,6 +14,8 @@ import pickle
 TEXT_VECTOR_SIZE = 150
 CONTEXT_VECTOR_SIZE = 250
 
+issue = 'Brexit' # Change to your issue
+
 def classify_issue(issue):
     stance_groups = {
         'Brexit': ['pro_brexit', 'anti_brexit'],
@@ -34,7 +36,7 @@ def classify_issue(issue):
     
     targets = stance_groups[issue] + ['neutral', 'irrelevant']
 
-    file_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
+    file_path = 'Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
     df = pd.read_csv(file_path)
 
     ## SMOTE ##
@@ -104,7 +106,7 @@ def classify_issue(issue):
     
     return X_pca, y, targets
 
-X_pca, y, targets = classify_issue('Brexit')
+X_pca, y, targets = classify_issue(issue)
 
 def evaluate_model(X, y, stances, n_splits=10, random_state=42):
     results = {stance: {'accuracy': [], 'precision': [], 'recall': [], 'f1_score': [], 'predictions': [], 'test_labels': []} for stance in stances}
@@ -198,7 +200,7 @@ def save_model(model, issue):
         pickle.dump(model, file)
 
 best_clf, overall_metrics_df = evaluate_model(X_pca, y, targets)
-save_model(best_clf, 'IsraelPalestineUS')
+save_model(best_clf, issue)
 
 def plot_learning_curve(estimator, X, y, cv, n_jobs=-1, train_sizes=np.linspace(0.1, 1.0, 5)):
     plt.figure(figsize=(12, 8))

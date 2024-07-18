@@ -75,7 +75,7 @@ for i in range(len(issues) + 1):
     print(f"Users present in {i} issues: {sum(user_data['issues_count'] == i)}")
 
 # Remove users who were present in none of the issues
-user_data = user_data[user_data['issues_count'] > 0].drop(columns=['issues_count'])
+user_data = user_data[user_data['issues_count'] > 1].drop(columns=['issues_count'])
 
 # Step 12: Print a count of the total number of users left
 print(f"Total number of users left: {len(user_data)}")
@@ -87,4 +87,4 @@ for issue, stances in stance_groups.items():
         user_data.rename(columns={f'{stance}_count': stance}, inplace=True)
 
 # Step 14: Save the new dataframe to a new CSV file
-user_data.to_csv('Analyses/User Data/usersUS_preprocessed.csv', index=False)
+user_data.to_csv('Analyses/User Data/usersUS>1_preprocessed.csv', index=False)

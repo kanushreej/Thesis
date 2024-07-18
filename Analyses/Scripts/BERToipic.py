@@ -8,6 +8,8 @@ import numpy as np
 
 df = pd.read_csv('Analyses/User Data/usersUK_preprocessed.csv')
 
+df = pd.read_csv('Analyses/User Data/usersUK_preprocessed.csv')
+
 # Define the opinion columns
 opinion_columns = [
     'pro_brexit', 'anti_brexit',
@@ -40,6 +42,9 @@ topics, _ = topic_model.fit_transform(df['opinions'].tolist())  # Pass list of s
 
 # Add topics to DataFrame
 df['topic'] = topics
+
+# Save the clustered data to a CSV file
+df.to_csv('Analyses/User Data/usersUK_clustered.csv', index=False)
 
 # Display the resulting clusters
 print(df)

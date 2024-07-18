@@ -4,6 +4,7 @@ from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
 import umap
 import matplotlib.pyplot as plt
+import numpy as np
 
 df = pd.read_csv('Analyses/User Data/usersUK_preprocessed.csv')
 

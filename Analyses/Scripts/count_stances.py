@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the preprocessed user data file
-user_data = pd.read_csv('Analyses/User Data/usersUK_preprocessed.csv')
+user_data = pd.read_csv('Analyses/User Data/usersUK_filtered.csv')
 
 # Initialize dictionaries to store the counts
 stance_min_count = {}
@@ -19,6 +19,15 @@ stance_columns = [
     'TaxationUK_neutral'
 ]
 
+stance_groups = {
+    'Brexit': ['pro_brexit', 'anti_brexit'],
+    'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
+    'HealthcareUK': ['pro_NHS', 'anti_NHS'],
+    'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],
+    'TaxationUK': ['pro_company_taxation', 'pro_worker_taxation'],
+}
+issues = list(stance_groups.keys())
+
 # Calculate the counts for each stance column
 for stance in stance_columns:
     stance_min_count[stance] = (user_data[stance] > 0).sum()
@@ -32,3 +41,9 @@ for stance, count in stance_min_count.items():
 print("\nTotal values of each stance column:")
 for stance, total in stance_total_count.items():
     print(f"{stance}: {total}")
+
+user_data['issues_count'] = user_data[[f'{stance}' for stances in stance_groups.values() for stance in stances] + 
+                                      [f'{issue}_neutral' for issue in issues]].gt(0).sum(axis=1)
+
+for i in range(len(issues) + 1):
+    print(f"Users present in {i} issues: {sum(user_data['issues_count'] == i)}")

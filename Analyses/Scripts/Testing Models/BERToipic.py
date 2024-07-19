@@ -27,41 +27,31 @@ opinion_columns = [
 scaler = StandardScaler()
 df[opinion_columns] = scaler.fit_transform(df[opinion_columns])
 
-# Convert normalized opinion columns to a string format for BERTopic
+# Convert normalized opinion columns to a string 
 df['opinions'] = df[opinion_columns].apply(lambda x: ' '.join(x.astype(str)), axis=1)
-
-# Ensure the conversion to strings
-print(df['opinions'])
 
 # Create a CountVectorizer
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(df['opinions'])
 
-# Create and fit BERTopic model with HDBSCAN parameters
-# Increase min_cluster_size to reduce the number of clusters
-#hdbscan_model = hdbscan.HDBSCAN(min_cluster_size=50, min_samples=1, gen_min_span_tree=True)
 cluster_model = KMeans(n_clusters=10)
 topic_model = BERTopic(hdbscan_model=cluster_model)
 
 # Fit and transform
-topics, _ = topic_model.fit_transform(df['opinions'].tolist())  # Pass list of strings to BERTopic
+topics, _ = topic_model.fit_transform(df['opinions'].tolist())  
 
-# Add topics to DataFrame
 df['topic'] = topics
 
 # Save the clustered data to a CSV file
 df.to_csv('Analyses/User Data/usersUK_clustered_Kmeans.csv', index=False)
 
-# Display the resulting clusters
 print(df)
-
-# Step 3: Analyze and Visualize Results
 
 # Topic distribution
 topic_distribution = df['topic'].value_counts().sort_index()
 print(topic_distribution)
 
-# Optionally, display the topic distribution in a DataFrame for a better view
+# Display the topic distribution in a DataFrame for a better view
 topic_distribution_df = topic_distribution.reset_index()
 topic_distribution_df.columns = ['Topic', 'User Count']
 print(topic_distribution_df)

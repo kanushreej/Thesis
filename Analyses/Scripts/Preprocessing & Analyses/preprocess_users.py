@@ -4,30 +4,30 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 # Load the preprocessed user data file
-user_data = pd.read_csv('Analyses/User Data/Collected Stances/usersUS_stances.csv')
+user_data = pd.read_csv('Analyses/User Data/Collected Stances/usersUK>1_stances.csv')
 
 # Calculate the number of opinions each user has
-# opinion_columns = [
-#     'pro_brexit', 'anti_brexit',
-#     'pro_climateAction', 'anti_climateAction',
-#     'pro_NHS', 'anti_NHS',
-#     'pro_israel', 'pro_palestine',
-#     'pro_company_taxation', 'pro_worker_taxation',
-#     'Brexit_neutral', 'ClimateChangeUK_neutral',
-#     'HealthcareUK_neutral', 'IsraelPalestineUK_neutral',
-#     'TaxationUK_neutral'
-# ]
-
 opinion_columns = [
-    'pro_immigration', 'anti_immigration',
+    'pro_brexit', 'anti_brexit',
     'pro_climateAction', 'anti_climateAction',
-    'public_healthcare', 'private_healthcare',
+    'pro_NHS', 'anti_NHS',
     'pro_israel', 'pro_palestine',
-    'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
-    'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
-    'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
-    'TaxationUS_neutral',
+    'pro_company_taxation', 'pro_worker_taxation',
+    'Brexit_neutral', 'ClimateChangeUK_neutral',
+    'HealthcareUK_neutral', 'IsraelPalestineUK_neutral',
+    'TaxationUK_neutral'
 ]
+
+# opinion_columns = [
+#     'pro_immigration', 'anti_immigration',
+#     'pro_climateAction', 'anti_climateAction',
+#     'public_healthcare', 'private_healthcare',
+#     'pro_israel', 'pro_palestine',
+#     'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
+#     'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
+#     'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
+#     'TaxationUS_neutral',
+# ]
 
 user_data['total_opinions'] = user_data[opinion_columns].sum(axis=1)
 
@@ -70,7 +70,7 @@ print(f"Number of users to be deleted: {num_users_to_delete}")
 # Prompt for user confirmation
 confirm = input("Do you want to delete these users and save the cleaned dataset? (y/n): ").strip().lower()
 if confirm == 'y':
-    filtered_users.to_csv('Analyses/User Data/Preprocessed/usersUS_preprocessed.csv', index=False)
-    print("Cleaned dataset saved as 'usersUS_cleaned.csv'.")
+    filtered_users.to_csv('Analyses/User Data/Preprocessed/usersUK>1_preprocessed.csv', index=False)
+    print("Cleaned dataset saved as 'usersUK>1_preprocessed.csv'.")
 else:
     print("No changes made.")

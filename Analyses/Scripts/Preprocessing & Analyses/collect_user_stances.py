@@ -2,30 +2,30 @@ import pandas as pd
 import os
 
 # Step 1: Create the list of issues through the stance groups variable
-# stance_groups = {
-#     'Brexit': ['pro_brexit', 'anti_brexit'],
-#     'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
-#     'HealthcareUK': ['pro_NHS', 'anti_NHS'],
-#     'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],
-#     'TaxationUK': ['pro_company_taxation', 'pro_worker_taxation'],
-# }
 stance_groups = {
-        'ImmigrationUS': ['pro_immigration', 'anti_immigration'],
-        'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
-        'HealthcareUS': ['public_healthcare', 'private_healthcare'],
-        'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
-        'TaxationUS': ['pro_middle_low_tax', 'pro_wealthy_corpo_tax']
-    }
+    'Brexit': ['pro_brexit', 'anti_brexit'],
+    'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
+    'HealthcareUK': ['pro_NHS', 'anti_NHS'],
+    'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],
+    'TaxationUK': ['pro_company_taxation', 'pro_worker_taxation'],
+}
+# stance_groups = {
+#         'ImmigrationUS': ['pro_immigration', 'anti_immigration'],
+#         'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
+#         'HealthcareUS': ['public_healthcare', 'private_healthcare'],
+#         'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
+#         'TaxationUS': ['pro_middle_low_tax', 'pro_wealthy_corpo_tax']
+#     }
 issues = list(stance_groups.keys())
 
 # Step 2: Load the user data file and print a count of the total number of users
-user_data = pd.read_csv('Analyses/User Data/US_all_users.csv')
+user_data = pd.read_csv('Analyses/User Data/All users/UK_all_users.csv')
 print(f"Total number of users: {len(user_data)}")
 
 user_data = user_data[['user_id', 'username', 'account_creation_date', 'comment_karma', 'post_karma']]
 
 # Directory containing the issue-based files
-directory = 'Analyses/Labelled Data/US'
+directory = 'Analyses/Labelled Data/UK'
 
 # Step 4-10: Process each issue-based file
 for issue, stances in stance_groups.items():
@@ -87,4 +87,4 @@ for issue, stances in stance_groups.items():
         user_data.rename(columns={f'{stance}_count': stance}, inplace=True)
 
 # Step 14: Save the new dataframe to a new CSV file
-user_data.to_csv('Analyses/User Data/usersUS>1_preprocessed.csv', index=False)
+user_data.to_csv('Analyses/User Data/usersUK>1_stances.csv', index=False)

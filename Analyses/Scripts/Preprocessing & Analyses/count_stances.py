@@ -19,6 +19,17 @@ stance_columns = [
     'TaxationUK_neutral'
 ]
 
+# stance_columns = [
+#     'pro_immigration', 'anti_immigration',
+#     'pro_climateAction', 'anti_climateAction',
+#     'public_healthcare', 'private_healthcare',
+#     'pro_israel', 'pro_palestine',
+#     'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
+#     'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
+#     'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
+#     'TaxationUS_neutral',
+# ]
+
 stance_groups = {
     'Brexit': ['pro_brexit', 'anti_brexit'],
     'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],

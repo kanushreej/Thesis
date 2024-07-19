@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Load the preprocessed user data file
-user_data = pd.read_csv('Analyses/User Data/usersUK_filtered.csv')
+user_data = pd.read_csv('Analyses/User Data/Preprocessed/usersUK>1_preprocessed.csv')
 
 # Initialize dictionaries to store the counts
 stance_min_count = {}
@@ -19,13 +19,32 @@ stance_columns = [
     'TaxationUK_neutral'
 ]
 
+# stance_columns = [
+#     'pro_immigration', 'anti_immigration',
+#     'pro_climateAction', 'anti_climateAction',
+#     'public_healthcare', 'private_healthcare',
+#     'pro_israel', 'pro_palestine',
+#     'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
+#     'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
+#     'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
+#     'TaxationUS_neutral',
+# ]
+
 stance_groups = {
     'Brexit': ['pro_brexit', 'anti_brexit'],
     'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
     'HealthcareUK': ['pro_NHS', 'anti_NHS'],
     'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],
     'TaxationUK': ['pro_company_taxation', 'pro_worker_taxation'],
+
+    # 'ImmigrationUS': ['pro_immigration', 'anti_immigration'],
+    # 'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
+    # 'HealthcareUS': ['public_healthcare', 'private_healthcare'],
+    # 'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
+    # 'TaxationUS': ['pro_middle_low_tax', 'pro_wealthy_corpo_tax']
 }
+
+        
 issues = list(stance_groups.keys())
 
 # Calculate the counts for each stance column

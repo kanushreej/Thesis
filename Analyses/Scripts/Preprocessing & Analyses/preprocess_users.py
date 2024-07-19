@@ -1,90 +1,76 @@
 import pandas as pd
-import os
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
-# Step 1: Create the list of issues through the stance groups variable
-# stance_groups = {
-#     'Brexit': ['pro_brexit', 'anti_brexit'],
-#     'ClimateChangeUK': ['pro_climateAction', 'anti_climateAction'],
-#     'HealthcareUK': ['pro_NHS', 'anti_NHS'],
-#     'IsraelPalestineUK': ['pro_israel', 'pro_palestine'],
-#     'TaxationUK': ['pro_company_taxation', 'pro_worker_taxation'],
-# }
-stance_groups = {
-        'ImmigrationUS': ['pro_immigration', 'anti_immigration'],
-        'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
-        'HealthcareUS': ['public_healthcare', 'private_healthcare'],
-        'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
-        'TaxationUS': ['pro_middle_low_tax', 'pro_wealthy_corpo_tax']
-    }
-issues = list(stance_groups.keys())
+# Load the preprocessed user data file
+user_data = pd.read_csv('Analyses/User Data/Collected Stances/usersUK>1_stances.csv')
 
-# Step 2: Load the user data file and print a count of the total number of users
-user_data = pd.read_csv('Analyses/User Data/US_all_users.csv')
-print(f"Total number of users: {len(user_data)}")
+# Calculate the number of opinions each user has
+opinion_columns = [
+    'pro_brexit', 'anti_brexit',
+    'pro_climateAction', 'anti_climateAction',
+    'pro_NHS', 'anti_NHS',
+    'pro_israel', 'pro_palestine',
+    'pro_company_taxation', 'pro_worker_taxation',
+    'Brexit_neutral', 'ClimateChangeUK_neutral',
+    'HealthcareUK_neutral', 'IsraelPalestineUK_neutral',
+    'TaxationUK_neutral'
+]
 
-user_data = user_data[['user_id', 'username', 'account_creation_date', 'comment_karma', 'post_karma']]
+# opinion_columns = [
+#     'pro_immigration', 'anti_immigration',
+#     'pro_climateAction', 'anti_climateAction',
+#     'public_healthcare', 'private_healthcare',
+#     'pro_israel', 'pro_palestine',
+#     'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
+#     'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
+#     'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
+#     'TaxationUS_neutral',
+# ]
 
-# Directory containing the issue-based files
-directory = 'Analyses/Labelled Data/US'
+user_data['total_opinions'] = user_data[opinion_columns].sum(axis=1)
 
-# Step 4-10: Process each issue-based file
-for issue, stances in stance_groups.items():
-    issue_file = os.path.join(directory, f'{issue}_labelled.csv')
-    if not os.path.exists(issue_file):
-        print(f"File not found: {issue_file}")
-        continue
+# Generate the normal distribution of the users based on the number of opinions
+mu, std = norm.fit(user_data['total_opinions'])
 
-    issue_data = pd.read_csv(issue_file)
+# Plot the distribution
+plt.figure(figsize=(10, 6))
+plt.hist(user_data['total_opinions'], bins=30, density=True, alpha=0.6, color='b')
 
-    # Combine 'text_raw' and 'context_raw' columns for ease of search
-    issue_data['combined_text'] = issue_data['text_raw'].fillna('') + issue_data['context_raw'].fillna('')
+# Plot the PDF
+xmin, xmax = -200, 200  # Adjusted x-axis range
+x = np.linspace(xmin, xmax, 100)
+p = norm.pdf(x, mu, std)
+plt.plot(x, p, 'k', linewidth=2)
 
-    # Remove data points containing the specific string
-    issue_data = issue_data[~issue_data['combined_text'].str.contains('I am a bot', case=False)]
-    issue_data = issue_data[~issue_data['combined_text'].str.contains('this action was performed automatically', case=False)]
-    # Drop the 'combined_text' column as it's no longer needed
-    issue_data.drop(columns=['combined_text'], inplace=True)
+title = f"Fit results: mu = {mu:.2f},  std = {std:.2f}"
+plt.title(title)
+plt.xlabel('Number of Opinions')
+plt.ylabel('Density')
+plt.xlim(xmin, xmax)  # Set the x-axis limits
+plt.grid(True)
+plt.show()
 
-    # Step 5: Keep only specific columns in the issue data
-    issue_data = issue_data[['author', stances[0], stances[1], 'neutral', 'irrelevant']]
+# Print key values of the distribution
+print(f"Mean (mu): {mu}")
+print(f"Standard Deviation (std): {std}")
+print(f"1 standard deviation range: {mu - std} to {mu + std}")
+print(f"2 standard deviations range: {mu - 2 * std} to {mu + 2 * std}")
 
-    # Step 6: Remove data points with irrelevant == 1 and then drop the column
-    issue_data = issue_data[issue_data['irrelevant'] != 1].drop(columns=['irrelevant'])
+# Filter users within 2 standard deviations
+lower_bound = mu - 2 * std
+upper_bound = mu + 2 * std
+filtered_users = user_data[(user_data['total_opinions'] >= lower_bound) & (user_data['total_opinions'] <= upper_bound)]
 
-    # Step 7: Convert the 'neutral' column to '{issue}_neutral'
-    issue_data.rename(columns={'neutral': f'{issue}_neutral'}, inplace=True)
+# Print the number of users to be deleted
+num_users_to_delete = len(user_data) - len(filtered_users)
+print(f"Number of users to be deleted: {num_users_to_delete}")
 
-    # Ensure all stance columns exist in the issue data
-    for stance in stances + [f'{issue}_neutral']:
-        if stance not in issue_data.columns:
-            issue_data[stance] = 0
-
-    # Step 8: Append the columns stance 1, stance 2, and {issue}_neutral to the user data
-    for stance in stances + [f'{issue}_neutral']:
-        stance_counts = issue_data.groupby('author')[stance].sum().reset_index()
-        stance_counts.rename(columns={stance: f'{stance}_count'}, inplace=True)
-        user_data = user_data.merge(stance_counts, how='left', left_on='username', right_on='author')
-        user_data[f'{stance}_count'] = user_data[f'{stance}_count'].fillna(0).astype(int)
-        user_data.drop(columns=['author'], inplace=True)
-
-# Step 11: Print counts of user involvement in issues
-user_data['issues_count'] = user_data[[f'{stance}_count' for stances in stance_groups.values() for stance in stances] + 
-                                      [f'{issue}_neutral_count' for issue in issues]].gt(0).sum(axis=1)
-
-for i in range(len(issues) + 1):
-    print(f"Users present in {i} issues: {sum(user_data['issues_count'] == i)}")
-
-# Remove users who were present in none of the issues
-user_data = user_data[user_data['issues_count'] > 1].drop(columns=['issues_count'])
-
-# Step 12: Print a count of the total number of users left
-print(f"Total number of users left: {len(user_data)}")
-
-# Step 13: Remove original stance columns and rename _count columns
-for issue, stances in stance_groups.items():
-    for stance in stances + [f'{issue}_neutral']:
-        user_data.drop(columns=[stance], inplace=True, errors='ignore')
-        user_data.rename(columns={f'{stance}_count': stance}, inplace=True)
-
-# Step 14: Save the new dataframe to a new CSV file
-user_data.to_csv('Analyses/User Data/usersUS>1_preprocessed.csv', index=False)
+# Prompt for user confirmation
+confirm = input("Do you want to delete these users and save the cleaned dataset? (y/n): ").strip().lower()
+if confirm == 'y':
+    filtered_users.to_csv('Analyses/User Data/Preprocessed/usersUK>1_preprocessed.csv', index=False)
+    print("Cleaned dataset saved as 'usersUK>1_preprocessed.csv'.")
+else:
+    print("No changes made.")

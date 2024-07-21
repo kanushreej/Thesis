@@ -3,25 +3,30 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from bertopic import BERTopic
 from sklearn.feature_extraction.text import CountVectorizer
-import hdbscan
 import umap
 import matplotlib.pyplot as plt
 import numpy as np
 
 # Load the data
-df = pd.read_csv('Analyses/User Data/usersUK_preprocessed.csv')
+df = pd.read_csv('Analyses/User Data/Preprocessed/usersUK_general.csv')
+region = 'UK'
 
-# Define the opinion columns
-opinion_columns = [
-    'pro_brexit', 'anti_brexit',
-    'pro_climateAction', 'anti_climateAction',
-    'pro_NHS', 'anti_NHS',
-    'pro_israel', 'pro_palestine',
-    'pro_company_taxation', 'pro_worker_taxation',
-    'Brexit_neutral', 'ClimateChangeUK_neutral',
-    'HealthcareUK_neutral', 'IsraelPalestineUK_neutral',
-    'TaxationUK_neutral'
-]
+if region == 'UK':
+    opinion_columns = [
+        'Brexit',
+        'ClimateChangeUK',
+        'HealthcareUK',
+        'IsraelPalestineUK',
+        'TaxationUK',
+    ]
+if region == 'US':
+        opinion_columns = [
+        'ImmigrationUS',
+        'ClimateChangeUS',
+        'HealthcareUS',
+        'IsraelPalestineUS',
+        'TaxationUS',
+    ]
 
 # Normalize the opinion columns
 scaler = StandardScaler()
@@ -34,7 +39,7 @@ df['opinions'] = df[opinion_columns].apply(lambda x: ' '.join(x.astype(str)), ax
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(df['opinions'])
 
-cluster_model = KMeans(n_clusters=10)
+cluster_model = KMeans(n_clusters=6)
 topic_model = BERTopic(hdbscan_model=cluster_model)
 
 # Fit and transform
@@ -42,8 +47,12 @@ topics, _ = topic_model.fit_transform(df['opinions'].tolist())
 
 df['topic'] = topics
 
+# Calculate and save distance to cluster center for each user
+distances = cluster_model.transform(df[opinion_columns])
+df['distance_to_center'] = [distances[i][topics[i]] for i in range(len(topics))]
+
 # Save the clustered data to a CSV file
-df.to_csv('Analyses/User Data/usersUK_clustered_Kmeans.csv', index=False)
+df.to_csv('Analyses/User Data/Clustered/usersUK_nr6.csv', index=False)
 
 print(df)
 

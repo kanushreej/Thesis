@@ -85,7 +85,7 @@ Key Points:
 The Silhouette Coefficient for a sample is (b - a) / max(a, b). 
 To clarify, b is the distance between a sample and the nearest cluster that the sample is not a part of. 
 """
-# Calculate the Calinski-Harabasz score
+# Calculate the Silhouette Coefficient
 ch_score = silhouette_score(X, labels)
 print(f"Silhouette Score: {ch_score}")
 

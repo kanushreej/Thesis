@@ -147,4 +147,4 @@ for issue, stances in stance_groups.items():
         user_data.drop(columns=[stance], inplace=True, errors='ignore')
 
 
-user_data.to_csv(f'Analyses/User Data/Collected Stances/users{region}_stances.csv', index=False)
+user_data.to_csv(f'Analyses/User Data/Collected Stances/users{region}_general.csv', index=False)

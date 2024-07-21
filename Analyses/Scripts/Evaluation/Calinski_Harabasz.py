@@ -25,29 +25,24 @@
 import pandas as pd
 from sklearn.metrics import calinski_harabasz_score
 
-df_clustered = pd.read_csv('Analyses/User Data/usersUK_clustered_Kmeans.csv')
-
-opinion_columns = [ # UK
-    'pro_brexit', 'anti_brexit',
-    'pro_climateAction', 'anti_climateAction',
-    'pro_NHS', 'anti_NHS',
-    'pro_israel', 'pro_palestine',
-    'pro_company_taxation', 'pro_worker_taxation',
-    'Brexit_neutral', 'ClimateChangeUK_neutral',
-    'HealthcareUK_neutral', 'IsraelPalestineUK_neutral',
-    'TaxationUK_neutral'
-]
-
-# opinion_columns = [   # US
-#     'pro_immigration', 'anti_immigration',
-#     'pro_climateAction', 'anti_climateAction',
-#     'public_healthcare', 'private_healthcare',
-#     'pro_israel', 'pro_palestine',
-#     'pro_middle_low_tax', 'pro_wealthy_corpo_tax',
-#     'ImmigrationUS_neutral', 'ClimateChangeUS_neutral',
-#     'HealthcareUS_neutral', 'IsraelPalestineUS_neutral',
-#     'TaxationUS_neutral',
-# ]
+df_clustered = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr6.csv')
+region = 'UK'
+if region == 'UK':
+    opinion_columns = [
+        'Brexit',
+        'ClimateChangeUK',
+        'HealthcareUK',
+        'IsraelPalestineUK',
+        'TaxationUK',
+    ]
+if region == 'US':
+        opinion_columns = [
+        'ImmigrationUS',
+        'ClimateChangeUS',
+        'HealthcareUS',
+        'IsraelPalestineUS',
+        'TaxationUS',
+    ]
 
 
 # Extract the opinions and the cluster labels

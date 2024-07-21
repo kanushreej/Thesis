@@ -39,7 +39,7 @@ df['opinions'] = df[opinion_columns].apply(lambda x: ' '.join(x.astype(str)), ax
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(df['opinions'])
 
-cluster_model = KMeans(n_clusters=6)
+cluster_model = KMeans(n_clusters=6) # Modify number of clusters
 topic_model = BERTopic(hdbscan_model=cluster_model)
 
 # Fit and transform
@@ -52,7 +52,7 @@ distances = cluster_model.transform(df[opinion_columns])
 df['distance_to_center'] = [distances[i][topics[i]] for i in range(len(topics))]
 
 # Save the clustered data to a CSV file
-df.to_csv('Analyses/User Data/Clustered/usersUK_nr6.csv', index=False)
+df.to_csv('Analyses/User Data/Clustered/usersUK_nr6.csv', index=False) # Rename here
 
 print(df)
 

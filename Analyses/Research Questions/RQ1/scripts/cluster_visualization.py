@@ -1,11 +1,11 @@
-import pandas as pd
 from datetime import datetime
+import pandas as pd
 import umap
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-# Load the data
+# Load the pre-clustered data
 df = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr8.csv')
 
 # Convert UNIX timestamp to datetime
@@ -33,9 +33,6 @@ df['cohort'] = pd.cut(df['years_since_creation'],
                       bins=cohort_boundaries, 
                       labels=cohort_labels,
                       right=False)
-
-# Load the pre-clustered data
-df = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr8.csv')
 
 # Define the opinion columns
 opinion_columns = [
@@ -66,9 +63,11 @@ cohort_colors = {
     '>10 years': 'purple'
 }
 
-# Plot the clusters
-plt.figure(figsize=(15, 10))
+# Load cluster centers
+cluster_centers = pd.read_csv('Analyses/User Data/Clustered/UK_cluster_centers.csv')
+embedding_centers = reducer.transform(cluster_centers)
 
+# Plot the clusters
 for topic in df['topic'].unique():
     plt.figure(figsize=(10, 7))
     for cohort, color in cohort_colors.items():
@@ -78,9 +77,6 @@ for topic in df['topic'].unique():
                     label=f'{cohort}', 
                     s=50, alpha=0.6)
     
-    # Plot cluster centers
-    cluster_centers = pd.read_csv('Analyses/User Data/Clustered/cluster_centers.csv')
-    embedding_centers = reducer.transform(cluster_centers)
     plt.scatter(embedding_centers[topic, 0], embedding_centers[topic, 1], 
                 c='black', marker='X', s=200, label='Cluster Center')
     
@@ -89,4 +85,3 @@ for topic in df['topic'].unique():
     plt.xlabel('UMAP Dimension 1')
     plt.ylabel('UMAP Dimension 2')
     plt.show()
-

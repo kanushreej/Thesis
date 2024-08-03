@@ -47,7 +47,7 @@ df['tenure'] = pd.cut(df['years_active'],
                       labels=['<1 year', '1-5 years', '5-10 years', '>10 years'])
 
 # Now proceed with the balancing
-target_size = min(df[df['tenure'] == '<1 year'].shape[0], 
+target_size = max(df[df['tenure'] == '<1 year'].shape[0], 
                   df[df['tenure'] == '1-5 years'].shape[0], 
                   df[df['tenure'] == '5-10 years'].shape[0], 
                   df[df['tenure'] == '>10 years'].shape[0])

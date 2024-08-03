@@ -2,10 +2,10 @@ import pandas as pd
 from datetime import datetime
 
 # Load the dataset
-data = pd.read_csv('Analyses/User Data/Clustered/usersUK_clustered_Kmeans_balanced.csv')
+data = pd.read_csv('Analyses/User Data/Clustered/usersUS_nr3.csv')
 
 # Convert UNIX timestamp to datetime
-data['account_creation_date'] = pd.to_datetime(data['account_creation_date'])
+data['account_creation_date'] = pd.to_datetime(data['account_creation_date'], unit='s')
 
 # Calculate current date
 current_date = datetime.now()

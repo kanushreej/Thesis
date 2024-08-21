@@ -21,8 +21,8 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 # Load labeled and unlabeled data
 base_directory = "C:/Users/rapha/Documents/CS_VU/Thesis"
 moderator_name = "Raphael"
-issue = "TaxationUK"
-team = "UK"
+issue = "ImmigrationUS"
+team = "US"
 
 labeled_df = pd.read_csv(f"{base_directory}/Thesis/Annotation/{team}/{moderator_name}/{issue}_labelled.csv")
 unlabeled_df = pd.read_csv(f"{base_directory}/Thesis/Subreddit Data/{team}/{issue}_data.csv")
@@ -33,10 +33,15 @@ unlabeled_df['text'] = unlabeled_df['title'].fillna('') + ' ' + unlabeled_df['bo
 
 # Define your labels
 label_columns = [
-            'pro_brexit', 'anti_brexit', 'pro_climateAction', 'anti_climateAction',
-            'pro_NHS', 'anti_NHS', 'pro_israel', 'pro_palestine',
-            'pro_company_taxation', 'pro_worker_taxation', 'neutral', 'irrelevant'
-        ]
+     'neutral', 'irrelevant',
+     'pro_immigration', 'anti_immigration',
+     'pro_climateAction', 'anti_climateAction',
+     'public_healthcare', 'private_healthcare',
+     'pro_israel', 'pro_palestine',
+     'pro_middle_low_tax', 'pro_wealthy_corpo_tax'
+]
+
+
 
 class RedditDataset(Dataset):
     def __init__(self, df, tokenizer, label_columns, max_len=512):

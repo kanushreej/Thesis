@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 
 def classify_issue(issue):
     stance_groups = {
-        'brexit': ['pro_brexit', 'anti_brexit'],
-        'climateAction': ['pro_climateAction', 'anti_climateAction'],
-        'NHS': ['pro_NHS', 'anti_NHS'],
-        'israel_palestine': ['pro_israel', 'pro_palestine'],
-        'taxation': ['pro_company_taxation', 'pro_worker_taxation']
+        'ImmigrationUS': ['pro_immigration','anti_immigration'],
+        'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
+        'HealthcareUS': ['public_healthcare','private_healthcare'],
+        'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
+        'TaxationUS': ['pro_company_taxation', 'pro_worker_taxation']
     }
     
     if issue not in stance_groups:
@@ -22,7 +22,7 @@ def classify_issue(issue):
     
     targets = stance_groups[issue] + ['neutral', 'irrelevant']
 
-    file_path = '/Users/adamzulficar/Documents/year3/Bachelor Project/Thesis/Automated Annotation/Training Data/UK/{}_training.csv'.format(issue)
+    file_path = 'C:/Users/rapha/Documents/CS_VU/Thesis/Thesis/Automated Annotation/Training Data/US/{}_training.csv'.format(issue)
     df = pd.read_csv(file_path)
 
     ## SMOTE ##
@@ -35,7 +35,13 @@ def classify_issue(issue):
     X = np.array([np.concatenate((f, c)) for f, c in zip(features, context)])
     y_combined = np.array(df[targets])
 
-    smote = SMOTE()
+    def combine_targets(row):
+        return np.argmax(row[targets])
+    
+    y_combined = df.apply(combine_targets, axis=1)
+
+
+    smote = SMOTE(random_state=42)
     X_resampled, y_resampled_combined = smote.fit_resample(X, y_combined)
 
     text_vector_length = len(str_to_array(df['text_vector'].iloc[0]))
@@ -52,7 +58,7 @@ def classify_issue(issue):
     resampled_data['context_vector'] = list(map(array_to_str, context_vectors_resampled))
 
     for i, target in enumerate(targets):
-        resampled_data[target] = y_resampled_combined[:, i]
+        resampled_data[target] = (y_resampled_combined ==i).astype(int)
 
     data = resampled_data
 
@@ -90,12 +96,12 @@ def classify_issue(issue):
     def resolve_contradictions(probabilities, stances):
         resolved_stances = np.zeros_like(probabilities)
         stance_groups = {
-            'brexit': ['pro_brexit', 'anti_brexit'],
-            'climateAction': ['pro_climateAction', 'anti_climateAction'],
-            'NHS': ['pro_NHS', 'anti_NHS'],
-            'israel_palestine': ['pro_israel', 'pro_palestine'],
-            'taxation': ['pro_company_taxation', 'pro_worker_taxation']
-        }
+            'ImmigrationUS': ['pro_brexit', 'anti_brexit'],
+        'ClimateChangeUS': ['pro_climateAction', 'anti_climateAction'],
+        'HealthcareUS': ['pro_NHS', 'anti_NHS'],
+        'IsraelPalestineUS': ['pro_israel', 'pro_palestine'],
+        'TaxationUS': ['pro_company_taxation', 'pro_worker_taxation']
+    }
 
         for i, prob in enumerate(probabilities):
             prob_dict = {stance: prob[j] for j, stance in enumerate(stances)}
@@ -243,4 +249,4 @@ def classify_issue(issue):
     # resolved_predictions = predict_and_resolve(X, targets)
     # print("Resolved Predictions:", resolved_predictions)
 
-classify_issue('brexit')
+classify_issue('ImmigrationUS')

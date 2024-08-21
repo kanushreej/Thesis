@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-df = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr8.csv')
-region = 'UK'
+df = pd.read_csv('Analyses/User Data/Clustered/usersUS_nr3.csv')
+region = 'US'
 
 if region == 'UK':
     opinion_columns = [

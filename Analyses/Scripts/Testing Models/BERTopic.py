@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load the data
-df = pd.read_csv('Analyses/User Data/Preprocessed/usersUK_general.csv')
-region = 'UK'
+df = pd.read_csv('Analyses/User Data/Preprocessed/usersUS_general.csv')
+region = 'US'
 
 if region == 'UK':
     opinion_columns = [
@@ -39,7 +39,7 @@ df['opinions'] = df[opinion_columns].apply(lambda x: ' '.join(x.astype(str)), ax
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(df['opinions'])
 
-cluster_model = KMeans(n_clusters=8, random_state=42) # Modify number of clusters
+cluster_model = KMeans(n_clusters=3, random_state=42) # Modify number of clusters
 topic_model = BERTopic(hdbscan_model=cluster_model)
 
 # Fit and transform
@@ -52,12 +52,12 @@ distances = cluster_model.transform(df[opinion_columns])
 df['distance_to_center'] = [distances[i][topics[i]] for i in range(len(topics))]
 
 # Save the clustered data to a CSV file
-df.to_csv('Analyses/User Data/Clustered/usersUK_nr8.csv', index=False) # Rename here
+df.to_csv('Analyses/User Data/Clustered/usersUS_with_clusters.csv', index=False) # Rename here
 
 # Save the cluster centers
 cluster_centers = cluster_model.cluster_centers_
 cluster_centers_df = pd.DataFrame(cluster_centers, columns=opinion_columns)
-cluster_centers_df.to_csv('Analyses/User Data/Clustered/UK_cluster_centers.csv', index=False)
+cluster_centers_df.to_csv('Analyses/User Data/Clustered/US_cluster_centers.csv', index=False)
 
 '''
 Analyses (can be uncommented)

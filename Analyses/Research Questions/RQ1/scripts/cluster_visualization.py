@@ -6,10 +6,10 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 # Load the pre-clustered data
-df = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr8.csv')
+df = pd.read_csv('Analyses/User Data/Clustered/usersUS_with_clusters.csv')
 
 # Convert UNIX timestamp to datetime
-df['account_creation_date'] = pd.to_datetime(df['account_creation_date'])
+df['account_creation_date'] = pd.to_datetime(df['account_creation_date'], unit='s')
 
 # Calculate current date
 current_date = datetime.now()
@@ -24,23 +24,27 @@ df['years_since_creation'] = df['days_since_creation'] / 365.25
 print("Summary statistics for account creation dates:")
 print(df['years_since_creation'].describe())
 
-# Define cohort boundaries correctly
-cohort_boundaries = [0, 1, 5, 10, df['years_since_creation'].max()]
-
-# Create cohorts with proper bin labels
-cohort_labels = ['<1 year', '1-5 years', '5-10 years', '>10 years']
-df['cohort'] = pd.cut(df['years_since_creation'], 
-                      bins=cohort_boundaries, 
-                      labels=cohort_labels,
-                      right=False)
+# Create quantiles
+quantile_labels = ['Quantile 1', 'Quantile 2', 'Quantile 3', 'Quantile 4']
+df['quantile_group'] = pd.qcut(df['years_since_creation'], 
+                               q=4, 
+                               labels=quantile_labels)
 
 # Define the opinion columns
+# opinion_columns = [
+#     'Brexit',
+#     'ClimateChangeUK',
+#     'HealthcareUK',
+#     'IsraelPalestineUK',
+#     'TaxationUK',
+# ]
+
 opinion_columns = [
-    'Brexit',
-    'ClimateChangeUK',
-    'HealthcareUK',
-    'IsraelPalestineUK',
-    'TaxationUK',
+    'ImmigrationUS',
+    'ClimateChangeUS',
+    'HealthcareUS',
+    'IsraelPalestineUS',
+    'TaxationUS',
 ]
 
 # Normalize the opinion columns (if not already normalized)
@@ -55,33 +59,33 @@ embedding = reducer.fit_transform(df[opinion_columns])
 df['UMAP1'] = embedding[:, 0]
 df['UMAP2'] = embedding[:, 1]
 
-# Define colors for each cohort
-cohort_colors = {
-    '<1 year': 'red',
-    '1-5 years': 'green',
-    '5-10 years': 'blue',
-    '>10 years': 'purple'
+# Define colors for each quantile group
+quantile_colors = {
+    'Quantile 1': 'red',
+    'Quantile 2': 'green',
+    'Quantile 3': 'blue',
+    'Quantile 4': 'purple'
 }
 
 # Load cluster centers
-cluster_centers = pd.read_csv('Analyses/User Data/Clustered/UK_cluster_centers.csv')
+cluster_centers = pd.read_csv('Analyses/User Data/Clustered/US_cluster_centers.csv')
 embedding_centers = reducer.transform(cluster_centers)
 
 # Plot the clusters
 for topic in df['topic'].unique():
     plt.figure(figsize=(10, 7))
-    for cohort, color in cohort_colors.items():
-        cohort_data = df[(df['topic'] == topic) & (df['cohort'] == cohort)]
-        plt.scatter(cohort_data['UMAP1'], cohort_data['UMAP2'], 
+    for quantile, color in quantile_colors.items():
+        quantile_data = df[(df['topic'] == topic) & (df['quantile_group'] == quantile)]
+        plt.scatter(quantile_data['UMAP1'], quantile_data['UMAP2'], 
                     c=color, 
-                    label=f'{cohort}', 
+                    label=f'{quantile}', 
                     s=50, alpha=0.6)
     
     plt.scatter(embedding_centers[topic, 0], embedding_centers[topic, 1], 
                 c='black', marker='X', s=200, label='Cluster Center')
     
     plt.legend()
-    plt.title(f'Cluster {topic} with User Cohorts')
+    plt.title(f'Cluster {topic} with User Quantile Groups')
     plt.xlabel('UMAP Dimension 1')
     plt.ylabel('UMAP Dimension 2')
     plt.show()

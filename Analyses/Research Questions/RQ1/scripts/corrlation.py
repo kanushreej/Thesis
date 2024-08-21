@@ -22,3 +22,6 @@ plt.xlabel('Days Since Account Creation')
 plt.ylabel('Distance to Center')
 plt.grid(True)
 plt.show()
+
+correlation_coefficient = data['days_since_creation'].corr(data['distance_to_center'])
+print(f"Correlation Coefficient between Days Since Creation and Distance to Center: {correlation_coefficient:.4f}")

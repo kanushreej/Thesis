@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silhouette_score
 from permetrics import ClusteringMetric
 
-df = pd.read_csv('Analyses/User Data/Clustered/usersUK_nr2.csv')
+df = pd.read_csv('Analyses/Research Questions/RQ1/Data/usersUK_5-10 years.csv')
 region = 'UK'
 if region == 'UK':
     opinion_columns = [
